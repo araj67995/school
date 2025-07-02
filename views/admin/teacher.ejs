@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>admin</title>
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"
+    />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="text-center mb-4">
+        <h4 class="text-white">Admin Panel</h4>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="/admin">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/admission">
+            <i class="bi bi-person-plus"></i> Admissions
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/student">
+            <i class="bi bi-mortarboard"></i> Students
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/admin/teacher">
+            <i class="bi bi-person-workspace"></i> Teachers
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/notice">
+            <i class="bi bi-megaphone"></i> Notices
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="main-content">
+      <div id="teachers" class="section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Teacher</h2>
+          <button class="btn btn-primary" onclick="addTeacher()">
+            <i class="bi bi-plus-circle"></i> Add Teacher
+          </button>
+        </div>
+        <div class="data-table">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Teacher ID</th>
+                <th>Name</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="teacherTableBody">
+              <% teacher.forEach(function(found) { %>
+               <tr>
+                <td><%=found.teacherId %></td>
+               <td><%=found.name %></td>
+                <td><%=found.subject %></td>
+                <td>
+                  <span class="status-badge <%=found.status %>.toLowerCase()}"
+                    ><%=found.status %></span
+                  >
+                </td>
+                <td>
+                  <button
+                    class="action-btn edit"
+                    onclick="viewTeacherDetails(`<%=found.teacherId %>`)"
+                  >
+                    <i class="bi bi-eye"></i> View
+                  </button>
+                  <button
+                    class="action-btn generate"
+                    onclick="generateCredentials()"
+                  >
+                    <i class="bi bi-key"></i> Generate
+                  </button>
+                </td>
+              </tr>                 
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+      <!-- Add Teacher Modal -->
+    <div class="modal fade" id="addTeacherModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <form id="addTeacherForm" action="/addTeacher" method="post">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Add Teacher</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+            <div class="modal-body">
+               <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Teacher Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="name"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Subject</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="subject"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Father's Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="father"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Mother's Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="mother"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Date of Birth</label>
+                  <input type="date" class="form-control" name="dob" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Gender</label>
+                  <select class="form-select" name="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <label class="form-label">Class</label>
+                  <select class="form-select" name="grade" required>
+                    <option value="">Select Class</option>
+                    <option value="NC">NC</option>
+                    <option value="LKG">LKG</option>
+                    <option value="UKG">UKG</option>
+                    <% for (let i = 1; i <= 11; i++) { if (i !== 10) { %>
+                    <option value="<%= i %>">Class <%= i %></option>
+                    <% } } %>
+                  </select>
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label">Section</label>
+                  <input type="text" class="form-control" name="section" required />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Previous Working Place</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="previousWorking"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Contact Number</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    name="contact"
+                    required
+                  />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Email ID</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    name="email"
+                    required
+                  />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Salary</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    name="salary"
+                    required
+                  />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Experience In Year</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    name="experience"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-12">
+                  <label class="form-label">Address</label>
+                  <textarea
+                    class="form-control"
+                    name="address"
+                    rows="3"
+                    required
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <div class="modal fade" id="teacherDetailsModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Teacher Details</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+         
+
+            <ul class="nav nav-tabs" id="teacherTabs">
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  data-bs-toggle="tab"
+                  href="#teacherInfo"
+                  >Information</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#salaryHistory"
+                  >Salary History</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  data-bs-toggle="tab"
+                  href="#teacherAttendance"
+                  >Attendance</a
+                >
+              </li>
+            </ul>
+            <div class="tab-content mt-3">
+              <div class="tab-pane fade show active" id="teacherInfo">
+                <!-- Additional teacher information -->
+                    <div class="teacher-info mb-4">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="info-item">
+                    <label class="text-muted">Teacher ID</label>
+                    <p class="mb-3" id="teacherId"></p>
+                  </div>
+                  <div class="info-item">
+                    <label class="text-muted">Full Name</label>
+                    <p class="mb-3" id="teacherName"></p>
+                  </div>
+                  <div class="info-item">
+                    <label class="text-muted">Father's Name</label>
+                    <p class="mb-3" id="teacherFather"></p>
+                  </div>
+                  <div class="info-item">
+                    <label class="text-muted">Mother's Name</label>
+                    <p class="mb-3" id="teacherMother"></p>
+                  </div>
+                  <div class="info-item">
+                    <label class="text-muted">Subject</label>
+                    <p class="mb-3" id="teacherSubject"></p>
+                  </div>
+                  <div class="info-item">
+                    <label class="text-muted">Class</label>
+                    <p class="mb-3" id="teacherClass"></p>
+                  </div>
+                  <div class="info-item">
+                    <label class="text-muted">Experience</label>
+                    <p class="mb-3" id="teacherExperience"></p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="info-item">
+                    <label class="text-muted">Date of Joining</label>
+                    <p class="mb-3" id="teacherJoiningDate"></p>
+                  </div>
+                  <div class="info-item">
+                    <label class="text-muted">Date of Birth</label>
+                     <p class="mb-3" id="teacherDob"></p>
+                  </div>
+                  <div class="info-item">
+                    <label class="text-muted">Gender</label>
+                    <p class="mb-3" id="teacherGender"></p>
+                  </div>
+                  <div class="info-item">
+                    <label class="text-muted">Mobile Number</label>
+                    <p class="mb-3" id="teacherMobile"></p>
+                  </div>
+                   <div class="info-item">
+                    <label class="text-muted">Email</label>
+                    <p class="mb-3" id="teacherEmail"></p>
+                  </div>
+                  <div class="info-item">
+                    <label class="text-muted">Section</label>
+                    <p class="mb-3" id="teacherSection"></p>
+                  </div>
+                  <div class="info-item">
+                    <label class="text-muted">Current Status</label>
+                    <span class="status-badge" id="teacherStatus"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-6">
+                  <div class="info-item">
+                    <label class="text-muted">Address</label>
+                    <p class="mb-3" id="teacherAddress"></p>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="info-item">
+                    <label class="text-muted">Previous Working Place</label>
+                    <p class="mb-3" id="teacherPrevious"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+              </div>
+              <div class="tab-pane fade" id="salaryHistory">
+                <!-- Salary history will be loaded here -->
+                
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="col-3 d-flex justify-content-evenly align-items-center mb-4">
+                   <h5>Salary :</h5>
+                    <h5 style="color: green;">5000</h5>
+                    </div>
+                    <button class="btn btn-primary">Add Salary</button>
+                  </div>
+                 
+                 <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Month</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                       <td>Jul</td>
+                       <td>40000</td>
+                       <td>Bank</td>
+                       <td>Paid</td>
+                    </tr>
+                  </tbody>
+                 </table>
+              </div>
+              <div class="tab-pane fade" id="teacherAttendance">
+                <!-- Teacher attendance will be loaded here -->
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                   <div>
+                    <h5>Attendance record :</h5>
+                     <select name="month" id="month" required>
+                      <option value="" >Select Month</option>
+                      <option value="01">January</option>
+                      <option value="02">February</option>
+                      <option value="03">March</option>
+                      <option value="04">April</option>
+                      <option value="05">May</option>
+                      <option value="06">June</option>
+                      <option value="07">July</option>
+                      <option value="08">August</option>
+                      <option value="09">September</option>
+                      <option value="10">October</option>
+                      <option value="11">November</option>
+                      <option value="12">December</option>
+                    </select>
+                   </div>
+                   <button class="btn btn-primary">+ Attendance</button>
+                  </div>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Remark</th>
+                        <th>Approve</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>06</td>
+                        <td>Present</td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+                        <tr>
+                        <td>07</td>
+                        <td>Absent</td>
+                        <td>personal reason</td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+       const teachers = [
+        <% teacher.forEach(function(found) { %> 
+        {
+          teacherId: "<%=found.teacherId %>",
+          name: "<%=found.name %>",
+          dob: "<%=found.dob %>",
+          gender: "<%=found.gender %>",
+          email: "<%=found.email %>",
+          address: "<%=found.address %>",
+          grade: "<%=found.grade %>",
+          section: "<%=found.section %>",
+          previous: "<%=found.previousWorking %>",
+          father: "<%=found.father %>",
+          mother: "<%=found.mother %>",
+          exper: "<%=found.experience %>",
+          salary: "<%=found.salary %>",
+          subject: "<%=found.subject %>",
+          status: "<%=found.status %>",
+          joining: "<%=found.joiningDate %>",
+          contact: "<%= found.contact %>",
+
+        },  
+        <% }); %>
+       ];
+
+      // Function to view teacher details
+      function viewTeacherDetails(id) {
+         const teacher = teachers.find(f => f.teacherId === id);
+
+         if(teacher){// Populate teacher detai
+        document.getElementById("teacherId").textContent = teacher.teacherId;
+        document.getElementById("teacherName").textContent = teacher.name;
+        document.getElementById("teacherFather").textContent = teacher.father;
+        document.getElementById("teacherMother").textContent = teacher.mother;
+        document.getElementById("teacherJoiningDate").textContent = teacher.joining;
+        document.getElementById("teacherEmail").textContent = teacher.email;
+        document.getElementById("teacherMobile").textContent = teacher.contact || "N/A";
+        document.getElementById("teacherAddress").textContent = teacher.address;
+        document.getElementById("teacherDob").textContent = teacher.dob;
+        document.getElementById("teacherClass").textContent = teacher.grade;
+        document.getElementById("teacherSubject").textContent = teacher.subject;
+        document.getElementById("teacherExperience").textContent = teacher.exper;
+        document.getElementById("teacherGender").textContent = teacher.gender;
+        document.getElementById("teacherPrevious").textContent = teacher.previous;
+        document.getElementById("teacherSection").textContent = teacher.section;
+
+
+        // Set status badge
+        const status = "Active"; // hardcoded status
+        const statusBadge = document.getElementById("teacherStatus");
+        statusBadge.textContent = status;
+        statusBadge.className = "status-badge " + status.toLowerCase();
+      };
+        
+
+        const modal = new bootstrap.Modal(
+          document.getElementById("teacherDetailsModal")
+        );
+        modal.show();
+      }
+
+      // Function to generate credentials
+      function generateCredentials() {
+        const username = "SR25200"; // enrollment no
+        const password = Math.random().toString(36).slice(-8); // random 8-char password
+
+        alert(
+          `Credentials generated:\nUsername: ${username}\nPassword: ${password}`
+        );
+      }
+
+         function addTeacher() {
+            const modal = new bootstrap.Modal(
+              document.getElementById("addTeacherModal")
+            );
+            modal.show();
+          }
+    </script>
+  </body>
+</html>
