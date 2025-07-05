@@ -62,7 +62,7 @@
               <div class="icon text-primary">
                 <i class="bi bi-mortarboard"></i>
               </div>
-              <div class="stat-value">1,234</div>
+              <div class="stat-value"><%= Students.length %></div>
               <div class="stat-label">Total Students</div>
             </div>
           </div>
@@ -71,7 +71,7 @@
               <div class="icon text-success">
                 <i class="bi bi-person-workspace"></i>
               </div>
-              <div class="stat-value">45</div>
+              <div class="stat-value"><%= Teachers.length %></div>
               <div class="stat-label">Total Teachers</div>
             </div>
           </div>
@@ -80,7 +80,7 @@
               <div class="icon text-warning">
                 <i class="bi bi-file-earmark-text"></i>
               </div>
-              <div class="stat-value">12</div>
+              <div class="stat-value"><%= Admissions.length %></div>
               <div class="stat-label">Pending Admissions</div>
             </div>
           </div>
@@ -89,75 +89,65 @@
               <div class="icon text-info">
                 <i class="bi bi-calendar-event"></i>
               </div>
-              <div class="stat-value">5</div>
+              <div class="stat-value"><%= ActiveNotice.length %></div>
               <div class="stat-label">Active Notices</div>
             </div>
           </div>
         </div>
 
-        <!-- Notices Section -->
-        <div class="row">
-          <div class="col-md-6">
-            <h3 class="mb-3">Recent Notices</h3>
-            <div class="notice-card">
-              <div class="notice-title">Annual Sports Day</div>
-              <div class="notice-content">
-                Annual sports day will be held on 15th March 2024.
-              </div>
-              <div class="notice-date">Posted on: 01/03/2024</div>
-            </div>
-            <div class="notice-card">
-              <div class="notice-title">Parent-Teacher Meeting</div>
-              <div class="notice-content">
-                PTM scheduled for 20th March 2024.
-              </div>
-              <div class="notice-date">Posted on: 28/02/2024</div>
-            </div>
+       <!-- Notices Section -->
+<div class="row">
+  <div class="col-md-6">
+    <h3 class="mb-3">Recent Notices</h3>
+    <% Notice.forEach(function(notice) { %>
+      <% if(notice.status === "Active") { %>
+        <div class="notice-card col-6">
+          <div class="notice-title"><%= notice.title %></div>
+          <div class="notice-content">
+            <%= notice.remark %>
           </div>
-          <div class="col-md-6">
-            <h3 class="mb-3">Pending Admissions</h3>
-            <div class="data-table" style="max-height: 250px; overflow-y: auto;">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Class</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% found.forEach(function (foundItem) { %>
-                  <tr>
-                    <td><%=foundItem.name %> <%= foundItem.lastname %></td>
-                    <td><%=foundItem.grade %></td>
-                    <td><%=foundItem.createdAt %></td>
-                    <% if (foundItem.status === "Approved") { %>
-                    <td>
-                      <span class="badge bg-success"
-                        ><%= foundItem.status %></span
-                      >
-                    </td>
-                    <% } else if (foundItem.status === "Pending") { %>
-                    <td>
-                      <span class="badge bg-warning"
-                        ><%= foundItem.status %></span
-                      >
-                    </td>
-                    <% } else { %>
-                    <td>
-                      <span class="badge bg-danger"
-                        ><%= foundItem.status %></span
-                      >
-                    </td>
-                    <% } %>
-                  </tr>
-                  <% }) %>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <div class="notice-date">Date: <%= notice.date %></div>
         </div>
+      <% } else { %> 
+         <div class="notice-card col-6">
+          <a href="/admin/notice" class="nav-link"> Click me to Add new Notice</a>
+         </div>
+        <% } %>
+    <% }); %>
+  </div>
+
+  <div class="col-md-6">
+    <h3 class="mb-3">Pending Admissions</h3>
+    <div class="data-table" style="max-height: 250px; overflow-y: auto">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Class</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% Admissions.forEach(function(admission) { %>
+            <% if (admission.status === "Pending") { %>
+              <tr>
+                <td><%= admission.name %> <%= admission.lastname %></td>
+                <td><%= admission.grade %></td>
+                <td><%= admission.createdAt %></td>
+                <td>
+                  <span class="badge bg-warning"><%= admission.status %></span>
+                </td>
+              </tr>
+            <% } %>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
       </div>
     </div>
   </body>

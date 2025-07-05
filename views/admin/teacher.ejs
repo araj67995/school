@@ -13,6 +13,41 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"
     />
+    <style>
+      .badge.text-success {
+        background-color: #d1e7dd !important;
+        color: #0f5132 !important;
+      }
+      .badge.text-danger {
+        background-color: #f8d7da !important;
+        color: #721c24 !important;
+      }
+      .badge.text-warning {
+        background-color: #fff3cd !important;
+        color: #856404 !important;
+      }
+      .badge.text-info {
+        background-color: #d1ecf1 !important;
+        color: #0c5460 !important;
+      }
+      .badge.text-secondary {
+        background-color: #e2e3e5 !important;
+        color: #383d41 !important;
+      }
+      
+      .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+      }
+      
+      .btn-group .btn i {
+        font-size: 0.875rem;
+      }
+      
+      .table td {
+        vertical-align: middle;
+      }
+    </style>
   </head>
   <body>
     <!-- Sidebar -->
@@ -58,17 +93,18 @@
           </button>
         </div>
         <div class="data-table">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Teacher ID</th>
-                <th>Name</th>
-                <th>Subject</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="teacherTableBody">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th style="width: 15%;">Teacher ID</th>
+                  <th style="width: 25%;">Name</th>
+                  <th style="width: 20%;">Subject</th>
+                  <th style="width: 15%;">Status</th>
+                  <th style="width: 25%;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="teacherTableBody">
               <% teacher.forEach(function(found) { %>
                <tr>
                 <td><%=found.teacherId %></td>
@@ -80,23 +116,28 @@
                   >
                 </td>
                 <td>
-                  <button
-                    class="action-btn edit"
-                    onclick="viewTeacherDetails(`<%=found.teacherId %>`)"
-                  >
-                    <i class="bi bi-eye"></i> View
-                  </button>
-                  <button
-                    class="action-btn generate"
-                    onclick="generateCredentials()"
-                  >
-                    <i class="bi bi-key"></i> Generate
-                  </button>
+                  <div class="btn-group" role="group">
+                    <button
+                      class="btn btn-sm btn-primary"
+                      onclick="viewTeacherDetails(`<%=found.teacherId %>`)"
+                      title="View Details"
+                    >
+                      <i class="bi bi-eye"></i> View
+                    </button>
+                    <button
+                      class="btn btn-sm btn-success"
+                      onclick="generateCredentials()"
+                      title="Generate Credentials"
+                    >
+                      <i class="bi bi-key"></i> Generate
+                    </button>
+                  </div>
                 </td>
               </tr>                 
               <% }); %>
             </tbody>
           </table>
+        </div>
         </div>
       </div>
     </div>
@@ -393,41 +434,36 @@
               </div>
               <div class="tab-pane fade" id="salaryHistory">
                 <!-- Salary history will be loaded here -->
-                
-                  <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="col-3 d-flex justify-content-evenly align-items-center mb-4">
-                   <h5>Salary :</h5>
-                    <h5 style="color: green;">5000</h5>
-                    </div>
-                    <button class="btn btn-primary">Add Salary</button>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <div class="d-flex align-items-center gap-3">
+                    <h5 class="mb-0">Current Salary:</h5>
+                    <h5 class="mb-0 text-success" id="currentSalary">₹0</h5>
                   </div>
-                 
-                 <table class="table">
-                  <thead>
-                    <tr>
-                      <th>Month</th>
-                      <th>Amount</th>
-                      <th>Method</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                       <td>Jul</td>
-                       <td>40000</td>
-                       <td>Bank</td>
-                       <td>Paid</td>
-                    </tr>
-                  </tbody>
-                 </table>
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-success" onclick="generateSalary()">
+                      <i class="bi bi-plus-circle"></i> Generate Salary
+                    </button>
+                    <button class="btn btn-primary" onclick="openSalaryModal()">
+                      <i class="bi bi-plus-circle"></i> Add Salary
+                    </button>
+                    <button class="btn btn-warning" onclick="openIncreaseSalaryModal()">
+                      <i class="bi bi-arrow-up-circle"></i> Increase Salary
+                    </button>
+                  </div>
+                </div>
+                
+                <div id="salaryTableContainer">
+                  <div class="text-center text-muted">
+                    <p>No salary records found</p>
+                  </div>
+                </div>
               </div>
               <div class="tab-pane fade" id="teacherAttendance">
-                <!-- Teacher attendance will be loaded here -->
-                  <div class="d-flex justify-content-between align-items-center mb-4">
-                   <div>
-                    <h5>Attendance record :</h5>
-                     <select name="month" id="month" required>
-                      <option value="" >Select Month</option>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <div class="d-flex align-items-center gap-3">
+                    <h5 class="mb-0">Attendance Record:</h5>
+                    <select name="month" id="monthSelect" class="form-select" style="width: auto;" required>
+                      <option value="">Select Month</option>
                       <option value="01">January</option>
                       <option value="02">February</option>
                       <option value="03">March</option>
@@ -441,34 +477,311 @@
                       <option value="11">November</option>
                       <option value="12">December</option>
                     </select>
-                   </div>
-                   <button class="btn btn-primary">+ Attendance</button>
                   </div>
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Remark</th>
-                        <th>Approve</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>06</td>
-                        <td>Present</td>
-                        <td></td>
-                        <td></td>
-                      </tr>
-                        <tr>
-                        <td>07</td>
-                        <td>Absent</td>
-                        <td>personal reason</td>
-                        <td></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                 </div>
+                  <button class="btn btn-primary" onclick="openLeaveModal()">
+                    <i class="bi bi-plus-circle"></i> Apply Leave
+                  </button>
+                </div>
+                <div id="attendanceSummary" class="mt-3 mb-3" style="display: none;">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="card text-center">
+                        <div class="card-body">
+                          <h5 class="card-title text-success" id="presentCount">0</h5>
+                          <p class="card-text">Present</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="card text-center">
+                        <div class="card-body">
+                          <h5 class="card-title text-danger" id="absentCount">0</h5>
+                          <p class="card-text">Absent</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="card text-center">
+                        <div class="card-body">
+                          <h5 class="card-title text-warning" id="halfDayCount">0</h5>
+                          <p class="card-text">Half Day</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="card text-center">
+                        <div class="card-body">
+                          <h5 class="card-title text-info" id="leaveCount">0</h5>
+                          <p class="card-text">Leave</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="attendanceTableContainer" class="mt-3">
+                  <div class="text-center text-muted">
+                    <p>Select a month to view attendance records</p>
+                  </div>
+                </div>
+              </div>
+              <!-- Leave Application Modal -->
+              <div class="modal fade" id="leaveModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <form id="leaveForm">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Apply for Leave</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="mb-3">
+                          <label class="form-label">From Date</label>
+                          <input type="date" class="form-control" name="fromDate" required />
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">To Date</label>
+                          <input type="date" class="form-control" name="toDate" required />
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Reason</label>
+                          <textarea class="form-control" name="reason" rows="2" required></textarea>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Apply</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Generate Salary Modal -->
+              <div class="modal fade" id="generateSalaryModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <form id="generateSalaryForm">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Generate Salary</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="mb-3">
+                          <label class="form-label">Month</label>
+                          <select class="form-select" name="month" required>
+                            <option value="">Select Month</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                          </select>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Year</label>
+                          <input type="number" class="form-control" name="year" value="2025" min="2020" max="2030" required />
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Generate</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Add Salary Modal -->
+              <div class="modal fade" id="addSalaryModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                  <form id="addSalaryForm">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Add Salary Record</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="row mb-3">
+                          <div class="col-md-6">
+                            <label class="form-label">Month</label>
+                            <select class="form-select" name="month" required>
+                              <option value="">Select Month</option>
+                              <option value="01">January</option>
+                              <option value="02">February</option>
+                              <option value="03">March</option>
+                              <option value="04">April</option>
+                              <option value="05">May</option>
+                              <option value="06">June</option>
+                              <option value="07">July</option>
+                              <option value="08">August</option>
+                              <option value="09">September</option>
+                              <option value="10">October</option>
+                              <option value="11">November</option>
+                              <option value="12">December</option>
+                            </select>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Year</label>
+                            <input type="number" class="form-control" name="year" value="2024" min="2020" max="2030" required />
+                          </div>
+                        </div>
+                        <div class="row mb-3">
+                          <div class="col-md-6">
+                            <label class="form-label">Basic Salary</label>
+                            <input type="number" class="form-control" name="basicSalary" id="basicSalaryInput" required />
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Allowances</label>
+                            <input type="number" class="form-control" name="allowances" id="allowancesInput" value="0" />
+                          </div>
+                        </div>
+                        <div class="row mb-3">
+                          <div class="col-md-6">
+                            <label class="form-label">Deductions</label>
+                            <input type="number" class="form-control" name="deductions" id="deductionsInput" value="0" />
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Payment Method</label>
+                            <select class="form-select" name="paymentMethod" required>
+                              <option value="Bank Transfer">Bank Transfer</option>
+                              <option value="Cash">Cash</option>
+                              <option value="Check">Check</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="row mb-3">
+                          <div class="col-md-6">
+                            <label class="form-label">Payment Status</label>
+                            <select class="form-select" name="paymentStatus" required>
+                              <option value="Pending">Pending</option>
+                              <option value="Paid">Paid</option>
+                              <option value="Cancelled">Cancelled</option>
+                            </select>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Payment Date</label>
+                            <input type="date" class="form-control" name="paymentDate" />
+                          </div>
+                        </div>
+                        <div class="row mb-3">
+                          <div class="col-md-12">
+                            <div class="alert alert-info">
+                              <strong>Net Salary: <span id="netSalaryDisplay">₹0</span></strong>
+                              <br><small class="text-muted">Basic Salary + Allowances - Deductions</small>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Remarks</label>
+                          <textarea class="form-control" name="remarks" rows="2"></textarea>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Salary</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Pay Salary Modal -->
+              <div class="modal fade" id="paySalaryModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <form id="paySalaryForm">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Update Payment Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="mb-3">
+                          <label class="form-label">Payment Status</label>
+                          <select class="form-select" name="paymentStatus" required>
+                            <option value="Pending">Pending</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Cancelled">Cancelled</option>
+                          </select>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Payment Method</label>
+                          <select class="form-select" name="paymentMethod" required>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Check">Check</option>
+                          </select>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Payment Date</label>
+                          <input type="date" class="form-control" name="paymentDate" />
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Remarks</label>
+                          <textarea class="form-control" name="remarks" rows="2"></textarea>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Update Payment</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Increase Salary Modal -->
+              <div class="modal fade" id="increaseSalaryModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <form id="increaseSalaryForm">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Increase Teacher Salary</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="mb-3">
+                          <label class="form-label">Current Salary</label>
+                          <input type="text" class="form-control" id="currentSalaryDisplay" readonly />
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Increase Type</label>
+                          <select class="form-select" name="increaseType" id="increaseType" required>
+                            <option value="">Select Type</option>
+                            <option value="percentage">Percentage (%)</option>
+                            <option value="fixed">Fixed Amount (₹)</option>
+                          </select>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Increase Value</label>
+                          <input type="number" class="form-control" name="increaseValue" id="increaseValue" min="0" step="0.01" required />
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">New Salary</label>
+                          <input type="text" class="form-control" id="newSalaryDisplay" readonly />
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Effective From</label>
+                          <input type="date" class="form-control" name="effectiveDate" required />
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Reason for Increase</label>
+                          <textarea class="form-control" name="reason" rows="3" required placeholder="e.g., Performance review, Promotion, Annual increment"></textarea>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning">Update Salary</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
@@ -478,67 +791,822 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script type="application/json" id="teachers-data">
+      <%- JSON.stringify(teacher) %>
+    </script>
+    
     <script>
-       const teachers = [
-        <% teacher.forEach(function(found) { %> 
-        {
-          teacherId: "<%=found.teacherId %>",
-          name: "<%=found.name %>",
-          dob: "<%=found.dob %>",
-          gender: "<%=found.gender %>",
-          email: "<%=found.email %>",
-          address: "<%=found.address %>",
-          grade: "<%=found.grade %>",
-          section: "<%=found.section %>",
-          previous: "<%=found.previousWorking %>",
-          father: "<%=found.father %>",
-          mother: "<%=found.mother %>",
-          exper: "<%=found.experience %>",
-          salary: "<%=found.salary %>",
-          subject: "<%=found.subject %>",
-          status: "<%=found.status %>",
-          joining: "<%=found.joiningDate %>",
-          contact: "<%= found.contact %>",
+      // Parse teachers data from the JSON script tag
+      const teachersData = JSON.parse(document.getElementById('teachers-data').textContent);
+      const teachers = teachersData.map(function(found) {
+        return {
+          teacherId: found.teacherId,
+          name: found.name,
+          dob: found.dob,
+          gender: found.gender,
+          email: found.email,
+          address: found.address,
+          grade: found.grade,
+          section: found.section,
+          previous: found.previousWorking,
+          father: found.father,
+          mother: found.mother,
+          exper: found.experience,
+          salary: found.salary,
+          subject: found.subject,
+          status: found.status,
+          joining: found.joiningDate,
+          contact: found.contact
+        };
+      });
 
-        },  
-        <% }); %>
-       ];
+      let selectedTeacherId = null;
 
-      // Function to view teacher details
-      function viewTeacherDetails(id) {
-         const teacher = teachers.find(f => f.teacherId === id);
-
-         if(teacher){// Populate teacher detai
-        document.getElementById("teacherId").textContent = teacher.teacherId;
-        document.getElementById("teacherName").textContent = teacher.name;
-        document.getElementById("teacherFather").textContent = teacher.father;
-        document.getElementById("teacherMother").textContent = teacher.mother;
-        document.getElementById("teacherJoiningDate").textContent = teacher.joining;
-        document.getElementById("teacherEmail").textContent = teacher.email;
-        document.getElementById("teacherMobile").textContent = teacher.contact || "N/A";
-        document.getElementById("teacherAddress").textContent = teacher.address;
-        document.getElementById("teacherDob").textContent = teacher.dob;
-        document.getElementById("teacherClass").textContent = teacher.grade;
-        document.getElementById("teacherSubject").textContent = teacher.subject;
-        document.getElementById("teacherExperience").textContent = teacher.exper;
-        document.getElementById("teacherGender").textContent = teacher.gender;
-        document.getElementById("teacherPrevious").textContent = teacher.previous;
-        document.getElementById("teacherSection").textContent = teacher.section;
-
-
-        // Set status badge
-        const status = "Active"; // hardcoded status
-        const statusBadge = document.getElementById("teacherStatus");
-        statusBadge.textContent = status;
-        statusBadge.className = "status-badge " + status.toLowerCase();
-      };
+      async function viewTeacherDetails(id) {
+        selectedTeacherId = id;
+        const teacher = teachers.find(f => f.teacherId === id);
+        if (teacher) {
+          document.getElementById("teacherId").textContent = teacher.teacherId;
+          document.getElementById("teacherName").textContent = teacher.name;
+          document.getElementById("teacherFather").textContent = teacher.father;
+          document.getElementById("teacherMother").textContent = teacher.mother;
+          document.getElementById("teacherJoiningDate").textContent = teacher.joining;
+          document.getElementById("teacherEmail").textContent = teacher.email;
+          document.getElementById("teacherMobile").textContent = teacher.contact || "N/A";
+          document.getElementById("teacherAddress").textContent = teacher.address;
+          document.getElementById("teacherDob").textContent = teacher.dob;
+          document.getElementById("teacherClass").textContent = teacher.grade;
+          document.getElementById("teacherSubject").textContent = teacher.subject;
+          document.getElementById("teacherExperience").textContent = teacher.exper;
+          document.getElementById("teacherGender").textContent = teacher.gender;
+          document.getElementById("teacherPrevious").textContent = teacher.previous;
+          document.getElementById("teacherSection").textContent = teacher.section;
+          const status = "Active";
+          const statusBadge = document.getElementById("teacherStatus");
+          statusBadge.textContent = status;
+          statusBadge.className = "status-badge " + status.toLowerCase();
+        }
+        // Reset month select and attendance table
+        document.getElementById('monthSelect').value = '';
+        document.getElementById('attendanceTableContainer').innerHTML = '';
+        document.getElementById('attendanceSummary').style.display = 'none';
         
-
-        const modal = new bootstrap.Modal(
-          document.getElementById("teacherDetailsModal")
-        );
+        // Set current salary
+        document.getElementById('currentSalary').textContent = `₹${teacher.salary}`;
+        
+        // Load salary history
+        await fetchSalaryHistory();
+        
+        const modal = new bootstrap.Modal(document.getElementById("teacherDetailsModal"));
         modal.show();
       }
+
+      document.getElementById('monthSelect').addEventListener('change', function() {
+        if (selectedTeacherId) fetchAndRenderAttendance(selectedTeacherId);
+      });
+
+      async function fetchAndRenderAttendance(teacherId) {
+        const month = document.getElementById('monthSelect').value;
+        if (!month) {
+          document.getElementById('attendanceTableContainer').innerHTML = '';
+          document.getElementById('attendanceSummary').style.display = 'none';
+          return;
+        }
+        const year = new Date().getFullYear();
+        const monthStr = `${year}-${month.padStart(2, '0')}`;
+        try {
+          const res = await fetch(`/admin/teacher-attendance/${teacherId}?month=${monthStr}`);
+          if (!res.ok) {
+            throw new Error('Failed to fetch attendance data');
+          }
+          const data = await res.json();
+          const attendance = {};
+          if (data.attendance) {
+            data.attendance.forEach(a => { attendance[a.date] = a; });
+          }
+          const leaves = data.leaves || [];
+          // Build a map of leave dates
+          const leaveMap = {};
+          leaves.forEach(l => {
+            let current = new Date(l.fromDate);
+            const end = new Date(l.toDate);
+            while (current <= end) {
+              const dateStr = current.toISOString().slice(0, 10);
+              leaveMap[dateStr] = l;
+              current.setDate(current.getDate() + 1);
+            }
+          });
+          renderAttendanceTable(attendance, leaveMap, leaves);
+          updateAttendanceSummary(attendance);
+        } catch (error) {
+          console.error('Error fetching attendance:', error);
+          document.getElementById('attendanceTableContainer').innerHTML = '<p class="text-danger">Error loading attendance data</p>';
+        }
+      }
+
+      function daysInMonth(month, year) {
+        return new Date(year, month, 0).getDate();
+      }
+
+      function updateAttendanceSummary(attendanceData) {
+        const summary = {
+          Present: 0,
+          Absent: 0,
+          'Half Day': 0,
+          Leave: 0
+        };
+
+        // Count attendance by status
+        Object.values(attendanceData).forEach(record => {
+          if (summary.hasOwnProperty(record.status)) {
+            summary[record.status]++;
+          }
+        });
+
+        // Update the summary cards
+        document.getElementById('presentCount').textContent = summary.Present;
+        document.getElementById('absentCount').textContent = summary.Absent;
+        document.getElementById('halfDayCount').textContent = summary['Half Day'];
+        document.getElementById('leaveCount').textContent = summary.Leave;
+
+        // Show the summary section
+        document.getElementById('attendanceSummary').style.display = 'block';
+      }
+
+      function renderAttendanceTable(attendanceData, leaveMap, leaves) {
+        const month = document.getElementById('monthSelect').value;
+        const year = new Date().getFullYear();
+        const days = daysInMonth(parseInt(month), year);
+        let table = `<table class='table table-striped'><thead class='table-dark'><tr><th>Date</th><th>Status</th><th>Remark</th><th>Action</th></tr></thead><tbody>`;
+        for (let d = 1; d <= days; d++) {
+          const dateStr = `${year}-${month.padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+          let record = attendanceData[dateStr];
+          let leave = leaveMap[dateStr];
+          if (record) {
+            // Already marked - show edit form
+            let statusClass = 'text-secondary';
+            if (record.status === 'Present') statusClass = 'text-success';
+            else if (record.status === 'Absent') statusClass = 'text-danger';
+            else if (record.status === 'Half Day') statusClass = 'text-warning';
+            else if (record.status === 'Leave') statusClass = 'text-info';
+            table += `<tr id="row-${dateStr}">
+              <td>${d}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge ${statusClass}">${record.status}</span>
+                  <select id='status-${dateStr}' class='form-select form-select-sm'>
+                    <option value='Present' ${record.status === 'Present' ? 'selected' : ''}>Present</option>
+                    <option value='Absent' ${record.status === 'Absent' ? 'selected' : ''}>Absent</option>
+                    <option value='Half Day' ${record.status === 'Half Day' ? 'selected' : ''}>Half Day</option>
+                    <option value='Leave' ${record.status === 'Leave' ? 'selected' : ''}>Leave</option>
+                  </select>
+                </div>
+              </td>
+              <td><input id='remark-${dateStr}' type='text' class='form-control form-control-sm' value="${record.remark || ''}" placeholder='Add remark'></td>
+              <td>
+                <button class='btn btn-sm btn-success' onclick="updateAttendance('${dateStr}')">Update</button>
+                <button class='btn btn-sm btn-danger' onclick="deleteAttendance('${dateStr}')">Delete</button>
+              </td>
+            </tr>`;
+          } else if (leave) {
+            // Leave request exists
+            if (leave.status === 'Pending') {
+              table += `<tr><td>${d}</td><td class="text-warning"><strong>Leave (Pending)</strong></td><td>${leave.reason}</td><td><button class='btn btn-sm btn-success' onclick="approveLeave('${leave._id}')">Approve</button> <button class='btn btn-sm btn-danger' onclick="rejectLeave('${leave._id}')">Reject</button></td></tr>`;
+            } else {
+              const statusClass = leave.status === 'Approved' ? 'text-success' : 'text-danger';
+              table += `<tr><td>${d}</td><td class="${statusClass}"><strong>Leave (${leave.status})</strong></td><td>${leave.reason}</td><td></td></tr>`;
+            }
+          } else {
+            // Not marked
+            table += `<tr><td>${d}</td><td><select id='status-${dateStr}' class='form-select form-select-sm'><option value='Present'>Present</option><option value='Absent'>Absent</option><option value='Half Day'>Half Day</option><option value='Leave'>Leave</option></select></td><td><input id='remark-${dateStr}' type='text' class='form-control form-control-sm' placeholder='Add remark'></td><td><button class='btn btn-sm btn-primary' onclick="markAttendance('${dateStr}')">Mark</button></td></tr>`;
+          }
+        }
+        table += '</tbody></table>';
+        document.getElementById('attendanceTableContainer').innerHTML = table;
+      }
+
+      async function markAttendance(date) {
+        const status = document.getElementById(`status-${date}`).value;
+        const remark = document.getElementById(`remark-${date}`).value;
+        try {
+          const response = await fetch('/admin/teacher-attendance/mark', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teacherId: selectedTeacherId, date, status, remark })
+          });
+          if (!response.ok) {
+            throw new Error('Failed to mark attendance');
+          }
+          await fetchAndRenderAttendance(selectedTeacherId);
+          // Show success message
+          const successAlert = document.createElement('div');
+          successAlert.className = 'alert alert-success alert-dismissible fade show';
+          successAlert.innerHTML = `
+            <strong>Success!</strong> Attendance marked successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          `;
+          document.getElementById('attendanceTableContainer').insertAdjacentElement('beforebegin', successAlert);
+          // Auto-remove after 3 seconds
+          setTimeout(() => {
+            if (successAlert.parentNode) {
+              successAlert.remove();
+            }
+          }, 3000);
+        } catch (error) {
+          console.error('Error marking attendance:', error);
+          alert('Error marking attendance. Please try again.');
+        }
+      }
+
+      async function approveLeave(leaveId) {
+        try {
+          const response = await fetch('/admin/teacher-leave/approve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ leaveId, status: 'Approved' })
+          });
+          if (!response.ok) {
+            throw new Error('Failed to approve leave');
+          }
+          await fetchAndRenderAttendance(selectedTeacherId);
+        } catch (error) {
+          console.error('Error approving leave:', error);
+          alert('Error approving leave. Please try again.');
+        }
+      }
+
+      // Leave form submit
+      const leaveForm = document.getElementById('leaveForm');
+      leaveForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(leaveForm);
+        const fromDate = formData.get('fromDate');
+        const toDate = formData.get('toDate');
+        const reason = formData.get('reason');
+        try {
+          const response = await fetch('/teacher/apply-leave', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teacherId: selectedTeacherId, fromDate, toDate, reason })
+          });
+          if (!response.ok) {
+            throw new Error('Failed to apply leave');
+          }
+          leaveForm.reset();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('leaveModal'));
+          modal.hide();
+          await fetchAndRenderAttendance(selectedTeacherId);
+        } catch (error) {
+          console.error('Error applying leave:', error);
+          alert('Error applying leave. Please try again.');
+        }
+      });
+
+      async function updateAttendance(date) {
+        const status = document.getElementById(`status-${date}`).value;
+        const remark = document.getElementById(`remark-${date}`).value;
+        try {
+          const response = await fetch('/admin/teacher-attendance/mark', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teacherId: selectedTeacherId, date, status, remark })
+          });
+          if (!response.ok) {
+            throw new Error('Failed to update attendance');
+          }
+          await fetchAndRenderAttendance(selectedTeacherId);
+          // Show success message
+          const successAlert = document.createElement('div');
+          successAlert.className = 'alert alert-success alert-dismissible fade show';
+          successAlert.innerHTML = `
+            <strong>Success!</strong> Attendance updated successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          `;
+          document.getElementById('attendanceTableContainer').insertAdjacentElement('beforebegin', successAlert);
+          // Auto-remove after 3 seconds
+          setTimeout(() => {
+            if (successAlert.parentNode) {
+              successAlert.remove();
+            }
+          }, 3000);
+        } catch (error) {
+          console.error('Error updating attendance:', error);
+          alert('Error updating attendance. Please try again.');
+        }
+      }
+
+      async function deleteAttendance(date) {
+        if (!confirm('Are you sure you want to delete this attendance record?')) {
+          return;
+        }
+        try {
+          const response = await fetch('/admin/teacher-attendance/delete', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teacherId: selectedTeacherId, date })
+          });
+          if (!response.ok) {
+            throw new Error('Failed to delete attendance');
+          }
+          await fetchAndRenderAttendance(selectedTeacherId);
+          // Show success message
+          const successAlert = document.createElement('div');
+          successAlert.className = 'alert alert-success alert-dismissible fade show';
+          successAlert.innerHTML = `
+            <strong>Success!</strong> Attendance record deleted successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          `;
+          document.getElementById('attendanceTableContainer').insertAdjacentElement('beforebegin', successAlert);
+          // Auto-remove after 3 seconds
+          setTimeout(() => {
+            if (successAlert.parentNode) {
+              successAlert.remove();
+            }
+          }, 3000);
+        } catch (error) {
+          console.error('Error deleting attendance:', error);
+          alert('Error deleting attendance. Please try again.');
+        }
+      }
+
+      async function rejectLeave(leaveId) {
+        try {
+          const response = await fetch('/admin/teacher-leave/approve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ leaveId, status: 'Rejected' })
+          });
+          if (!response.ok) {
+            throw new Error('Failed to reject leave');
+          }
+          await fetchAndRenderAttendance(selectedTeacherId);
+        } catch (error) {
+          console.error('Error rejecting leave:', error);
+          alert('Error rejecting leave. Please try again.');
+        }
+      }
+      
+      function openLeaveModal() {
+        const modal = new bootstrap.Modal(document.getElementById('leaveModal'));
+        modal.show();
+      }
+
+      // Salary functions
+      let selectedSalaryId = null;
+
+      function openSalaryModal() {
+        const modal = new bootstrap.Modal(document.getElementById('addSalaryModal'));
+        modal.show();
+        
+        // Set default basic salary from teacher data
+        const teacher = teachers.find(f => f.teacherId === selectedTeacherId);
+        if (teacher) {
+          document.getElementById('basicSalaryInput').value = teacher.salary;
+        }
+        
+        // Add event listeners for real-time net salary calculation
+        document.getElementById('basicSalaryInput').addEventListener('input', calculateNetSalary);
+        document.getElementById('allowancesInput').addEventListener('input', calculateNetSalary);
+        document.getElementById('deductionsInput').addEventListener('input', calculateNetSalary);
+      }
+
+      function openIncreaseSalaryModal() {
+        const modal = new bootstrap.Modal(document.getElementById('increaseSalaryModal'));
+        modal.show();
+        
+        // Clear form first
+        document.getElementById('increaseSalaryForm').reset();
+        document.getElementById('newSalaryDisplay').value = '';
+        
+        // Set current salary display
+        const teacher = teachers.find(f => f.teacherId === selectedTeacherId);
+        if (teacher) {
+          document.getElementById('currentSalaryDisplay').value = `₹${teacher.salary}`;
+        }
+        
+        // Remove existing event listeners to prevent duplicates
+        const increaseTypeSelect = document.getElementById('increaseType');
+        const increaseValueInput = document.getElementById('increaseValue');
+        
+        // Clone and replace elements to remove old event listeners
+        const newIncreaseTypeSelect = increaseTypeSelect.cloneNode(true);
+        const newIncreaseValueInput = increaseValueInput.cloneNode(true);
+        
+        increaseTypeSelect.parentNode.replaceChild(newIncreaseTypeSelect, increaseTypeSelect);
+        increaseValueInput.parentNode.replaceChild(newIncreaseValueInput, increaseValueInput);
+        
+        // Add event listeners for real-time new salary calculation
+        newIncreaseTypeSelect.addEventListener('change', calculateNewSalary);
+        newIncreaseValueInput.addEventListener('input', calculateNewSalary);
+      }
+      
+      function calculateNewSalary() {
+        const teacher = teachers.find(f => f.teacherId === selectedTeacherId);
+        if (!teacher) return;
+        
+        const currentSalary = parseInt(teacher.salary);
+        const increaseType = document.getElementById('increaseType').value;
+        const increaseValue = parseFloat(document.getElementById('increaseValue').value) || 0;
+        
+        let newSalary = currentSalary;
+        
+        if (increaseType === 'percentage') {
+          newSalary = currentSalary + (currentSalary * increaseValue / 100);
+        } else if (increaseType === 'fixed') {
+          newSalary = currentSalary + increaseValue;
+        }
+        
+        document.getElementById('newSalaryDisplay').value = `₹${Math.round(newSalary)}`;
+      }
+      
+      function calculateNetSalary() {
+        const basicSalary = parseInt(document.getElementById('basicSalaryInput').value) || 0;
+        const allowances = parseInt(document.getElementById('allowancesInput').value) || 0;
+        const deductions = parseInt(document.getElementById('deductionsInput').value) || 0;
+        const netSalary = basicSalary + allowances - deductions;
+        
+        // Update net salary display if it exists
+        const netSalaryDisplay = document.getElementById('netSalaryDisplay');
+        if (netSalaryDisplay) {
+          netSalaryDisplay.textContent = `₹${netSalary}`;
+        }
+      }
+
+      function generateSalary() {
+        const modal = new bootstrap.Modal(document.getElementById('generateSalaryModal'));
+        modal.show();
+      }
+
+      async function fetchSalaryHistory() {
+        if (!selectedTeacherId) return;
+        
+        try {
+          const response = await fetch(`/admin/teacher-salary/${selectedTeacherId}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch salary history');
+          }
+          const data = await response.json();
+          renderSalaryTable(data.salaries);
+        } catch (error) {
+          console.error('Error fetching salary history:', error);
+          document.getElementById('salaryTableContainer').innerHTML = '<p class="text-danger">Error loading salary data</p>';
+        }
+      }
+
+      function renderSalaryTable(salaries) {
+        if (!salaries || salaries.length === 0) {
+          document.getElementById('salaryTableContainer').innerHTML = `
+            <div class="text-center text-muted">
+              <p>No salary records found</p>
+            </div>
+          `;
+          return;
+        }
+
+        let table = `
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th style="width: 10%;">Month/Year</th>
+                  <th style="width: 12%;">Basic Salary</th>
+                  <th style="width: 10%;">Allowances</th>
+                  <th style="width: 10%;">Deductions</th>
+                  <th style="width: 12%;">Net Salary</th>
+                  <th style="width: 12%;">Payment Method</th>
+                  <th style="width: 10%;">Status</th>
+                  <th style="width: 14%;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+        salaries.forEach(salary => {
+          // Format month/year - extract month from salary.month (format: YYYY-MM or YYYY-MM-increase-timestamp)
+          let monthYear = '';
+          if (salary.month.includes('-increase-')) {
+            // For salary increase records, extract the original month
+            const monthPart = salary.month.split('-increase-')[0];
+            const month = monthPart.split('-')[1];
+            monthYear = `${month}/${salary.year}`;
+          } else {
+            // For regular salary records
+            const month = salary.month.split('-')[1];
+            monthYear = `${month}/${salary.year}`;
+          }
+          
+          const statusClass = salary.paymentStatus === 'Paid' ? 'text-success' : 
+                             salary.paymentStatus === 'Pending' ? 'text-warning' : 'text-danger';
+          
+          table += `
+            <tr>
+              <td>${monthYear}</td>
+              <td>₹${salary.basicSalary}</td>
+              <td>₹${salary.allowances}</td>
+              <td>₹${salary.deductions}</td>
+              <td><strong>₹${salary.netSalary}</strong></td>
+              <td>${salary.paymentMethod}</td>
+              <td><span class="badge ${statusClass}">${salary.paymentStatus}</span></td>
+              <td>
+                <div class="btn-group" role="group">
+                  <button class="btn btn-sm btn-primary" onclick="paySalary('${salary._id}')" title="Update Payment">
+                    <i class="bi bi-credit-card"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteSalary('${salary._id}')" title="Delete Record">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+
+                  table += '</tbody></table></div>';
+          document.getElementById('salaryTableContainer').innerHTML = table;
+      }
+
+      function paySalary(salaryId) {
+        selectedSalaryId = salaryId;
+        const modal = new bootstrap.Modal(document.getElementById('paySalaryModal'));
+        modal.show();
+      }
+
+      async function deleteSalary(salaryId) {
+        if (!confirm('Are you sure you want to delete this salary record?')) {
+          return;
+        }
+        
+        try {
+          const response = await fetch(`/admin/teacher-salary/delete/${salaryId}`, {
+            method: 'DELETE'
+          });
+          if (!response.ok) {
+            throw new Error('Failed to delete salary record');
+          }
+          await fetchSalaryHistory();
+          // Show success message
+          const successAlert = document.createElement('div');
+          successAlert.className = 'alert alert-success alert-dismissible fade show';
+          successAlert.innerHTML = `
+            <strong>Success!</strong> Salary record deleted successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          `;
+          document.getElementById('salaryTableContainer').insertAdjacentElement('beforebegin', successAlert);
+          setTimeout(() => {
+            if (successAlert.parentNode) {
+              successAlert.remove();
+            }
+          }, 3000);
+        } catch (error) {
+          console.error('Error deleting salary record:', error);
+          alert('Error deleting salary record. Please try again.');
+        }
+      }
+
+      // Form event listeners
+      const generateSalaryForm = document.getElementById('generateSalaryForm');
+      generateSalaryForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(generateSalaryForm);
+        const month = formData.get('month');
+        const year = formData.get('year');
+        const monthStr = `${year}-${month.padStart(2, '0')}`;
+        
+        try {
+          const response = await fetch('/admin/teacher-salary/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teacherId: selectedTeacherId, month: monthStr, year: parseInt(year) })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to generate salary');
+          }
+          
+          generateSalaryForm.reset();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('generateSalaryModal'));
+          modal.hide();
+          await fetchSalaryHistory();
+          
+          // Show success message
+          const successAlert = document.createElement('div');
+          successAlert.className = 'alert alert-success alert-dismissible fade show';
+          successAlert.innerHTML = `
+            <strong>Success!</strong> Salary generated successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          `;
+          document.getElementById('salaryTableContainer').insertAdjacentElement('beforebegin', successAlert);
+          setTimeout(() => {
+            if (successAlert.parentNode) {
+              successAlert.remove();
+            }
+          }, 3000);
+        } catch (error) {
+          console.error('Error generating salary:', error);
+          alert(error.message || 'Error generating salary. Please try again.');
+        }
+      });
+
+      const paySalaryForm = document.getElementById('paySalaryForm');
+      paySalaryForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(paySalaryForm);
+        const paymentStatus = formData.get('paymentStatus');
+        const paymentMethod = formData.get('paymentMethod');
+        const paymentDate = formData.get('paymentDate');
+        const remarks = formData.get('remarks');
+        
+        try {
+          const response = await fetch('/admin/teacher-salary/pay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              salaryId: selectedSalaryId, 
+              paymentStatus, 
+              paymentMethod, 
+              paymentDate, 
+              remarks 
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to update payment status');
+          }
+          
+          paySalaryForm.reset();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('paySalaryModal'));
+          modal.hide();
+          await fetchSalaryHistory();
+          
+          // Show success message
+          const successAlert = document.createElement('div');
+          successAlert.className = 'alert alert-success alert-dismissible fade show';
+          successAlert.innerHTML = `
+            <strong>Success!</strong> Payment status updated successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          `;
+          document.getElementById('salaryTableContainer').insertAdjacentElement('beforebegin', successAlert);
+          setTimeout(() => {
+            if (successAlert.parentNode) {
+              successAlert.remove();
+            }
+          }, 3000);
+        } catch (error) {
+          console.error('Error updating payment status:', error);
+          alert('Error updating payment status. Please try again.');
+        }
+      });
+
+      // Add salary form event listener
+      const addSalaryForm = document.getElementById('addSalaryForm');
+      addSalaryForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(addSalaryForm);
+        const month = formData.get('month');
+        const year = formData.get('year');
+        const monthStr = `${year}-${month.padStart(2, '0')}`;
+        const basicSalary = formData.get('basicSalary');
+        const allowances = formData.get('allowances');
+        const deductions = formData.get('deductions');
+        const paymentMethod = formData.get('paymentMethod');
+        const paymentStatus = formData.get('paymentStatus');
+        const paymentDate = formData.get('paymentDate');
+        const remarks = formData.get('remarks');
+        
+        try {
+          const response = await fetch('/admin/teacher-salary/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              teacherId: selectedTeacherId, 
+              month: monthStr, 
+              year: parseInt(year), 
+              basicSalary, 
+              allowances, 
+              deductions, 
+              paymentMethod, 
+              paymentStatus, 
+              paymentDate, 
+              remarks 
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to add salary record');
+          }
+          
+          addSalaryForm.reset();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addSalaryModal'));
+          modal.hide();
+          await fetchSalaryHistory();
+          
+          // Show success message
+          const successAlert = document.createElement('div');
+          successAlert.className = 'alert alert-success alert-dismissible fade show';
+          successAlert.innerHTML = `
+            <strong>Success!</strong> Salary record added successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          `;
+          document.getElementById('salaryTableContainer').insertAdjacentElement('beforebegin', successAlert);
+          setTimeout(() => {
+            if (successAlert.parentNode) {
+              successAlert.remove();
+            }
+          }, 3000);
+        } catch (error) {
+          console.error('Error adding salary record:', error);
+          alert(error.message || 'Error adding salary record. Please try again.');
+        }
+      });
+
+      // Increase salary form event listener
+      const increaseSalaryForm = document.getElementById('increaseSalaryForm');
+      increaseSalaryForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Validate form data
+        const formData = new FormData(increaseSalaryForm);
+        const increaseType = formData.get('increaseType');
+        const increaseValue = formData.get('increaseValue');
+        const effectiveDate = formData.get('effectiveDate');
+        const reason = formData.get('reason');
+        
+        // Frontend validation
+        if (!increaseType || !increaseValue || !effectiveDate || !reason.trim()) {
+          alert('Please fill in all required fields');
+          return;
+        }
+        
+        if (parseFloat(increaseValue) <= 0) {
+          alert('Increase value must be greater than 0');
+          return;
+        }
+        
+        console.log('Submitting salary increase:', {
+          teacherId: selectedTeacherId,
+          increaseType,
+          increaseValue,
+          effectiveDate,
+          reason
+        });
+        
+        try {
+          const response = await fetch('/admin/teacher-salary/increase', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              teacherId: selectedTeacherId, 
+              increaseType, 
+              increaseValue, 
+              effectiveDate, 
+              reason: reason.trim()
+            })
+          });
+          
+          console.log('Response status:', response.status);
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Server error:', errorData);
+            throw new Error(errorData.message || 'Failed to increase salary');
+          }
+          
+          const data = await response.json();
+          console.log('Success response:', data);
+          
+          increaseSalaryForm.reset();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('increaseSalaryModal'));
+          modal.hide();
+          
+          // Update the current salary display in the UI
+          const teacher = teachers.find(f => f.teacherId === selectedTeacherId);
+          if (teacher) {
+            teacher.salary = data.newSalary;
+            document.getElementById('currentSalary').textContent = `₹${data.newSalary}`;
+          }
+          
+          await fetchSalaryHistory();
+          
+          // Show success message
+          const successAlert = document.createElement('div');
+          successAlert.className = 'alert alert-success alert-dismissible fade show';
+          successAlert.innerHTML = `
+            <strong>Success!</strong> Salary increased from ₹${data.oldSalary} to ₹${data.newSalary}.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          `;
+          document.getElementById('salaryTableContainer').insertAdjacentElement('beforebegin', successAlert);
+          setTimeout(() => {
+            if (successAlert.parentNode) {
+              successAlert.remove();
+            }
+          }, 5000);
+        } catch (error) {
+          console.error('Error increasing salary:', error);
+          alert(error.message || 'Error increasing salary. Please try again.');
+        }
+      });
 
       // Function to generate credentials
       function generateCredentials() {
@@ -550,12 +1618,12 @@
         );
       }
 
-         function addTeacher() {
-            const modal = new bootstrap.Modal(
-              document.getElementById("addTeacherModal")
-            );
-            modal.show();
-          }
+      function addTeacher() {
+        const modal = new bootstrap.Modal(
+          document.getElementById("addTeacherModal")
+        );
+        modal.show();
+      }
     </script>
   </body>
 </html>

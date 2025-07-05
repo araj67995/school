@@ -64,16 +64,25 @@
                             <th>Title</th>
                             <th>Date</th>
                             <th>Status</th>
+                            <th>Remark</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="noticeTableBody">
-                       <tr>
-                            <td>holi</td>
-                            <td>10/03/2025</td>
-                            <td>Inactive</td>
-                            <td>School is closed upto 17/03</td>
+                      <form action="/editNotice" method="post">
+                      <% Notice.forEach(function(found) { %>
+                          <tr>
+                            <td><%= found.title %></td>
+                            <td><%= found.date %></td>
+                            <td><%= found.status %></td>
+                            <td><%= found.remark %></td>
+                            <td>
+                              <button type="submit" value="<%=found._id %>,edit,<%= found.status %>" name="btn" class="btn bi-pencil-square text-primary"></button>
+                              <button type="submit" value="<%=found._id %>,delete,<%= found.status %>" name="btn" class="btn bi-trash text-danger"></button>
+                            </td>
                         </tr>
+                      <% }); %>
+                      </form>
                     </tbody>
                 </table>
             </div>
@@ -84,7 +93,7 @@
     <!-- Add Notice Modal -->
 <div class="modal fade" id="addNoticeModal" tabindex="-1" aria-labelledby="addNoticeModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form id="noticeForm" onsubmit="addNotice(event)">
+    <form id="noticeForm" method="post" action="/addNotice">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="addNoticeModalLabel">Add New Notice</h5>
@@ -93,22 +102,22 @@
         <div class="modal-body">
           <div class="mb-3">
             <label for="noticeTitle" class="form-label">Title</label>
-            <input type="text" class="form-control" id="noticeTitle" required>
+            <input type="text" class="form-control" name="title" required>
           </div>
           <div class="mb-3">
             <label for="noticeDate" class="form-label">Date</label>
-            <input type="date" class="form-control" id="noticeDate" required>
+            <input type="date" class="form-control" name="date" required>
           </div>
           <div class="mb-3">
             <label for="noticeStatus" class="form-label">Status</label>
-            <select class="form-select" id="noticeStatus" required>
+            <select class="form-select" name="status" required>
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
             </select>
           </div>
            <div class="mb-3">
             <label for="noticeAction" class="form-label">Action</label>
-            <input type="text" class="form-control" id="noticeAction" required>
+            <input type="text" class="form-control" name="remark" required>
           </div>
         </div>
         <div class="modal-footer">

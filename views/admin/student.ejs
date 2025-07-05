@@ -133,7 +133,7 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="info-item">
-                    <label class="text-muted">Enrollment Number</label>
+                    <label class="text-muted">Enrollment No.</label>
                     <p class="mb-3" id="studentEnrollment"></p>
                   </div>
                   <div class="info-item">
@@ -201,29 +201,59 @@
                     <p class="mb-3" id="document"></p>
                   </div>
                 </div>
-                  <div class="col-6">
+                  <div class="col-2">
                   <div class="info-item">
                     <label class="text-muted">Class</label>
                     <p class="mb-3" id="grade"></p>
                   </div>
                 </div>
+                <div class="col-2">
+                  <div class="info-item">
+                    <label class="text-muted">Section</label>
+                    <p class="mb-3" id="section"></p>
+                  </div>
+                </div>
+                <div class="col-2">
+                   <div class="info-item">
+                    <label class="text-muted">Roll No.</label>
+                    <p class="mb-3" id="rollno"></p>
+                  </div>
+                </div>
              </div>
               </div>
 
-             <div class="row mt-6">
-                <form action="/updateStatus" method="post">
-                 <div class="row mt-3">
+             <div class="row ">
+                 <div class="row ">
                 <div class="col-6">
                   <div class="info-item">
+                       <form action="/updateStatus" method="post">
                      <input type="hidden"  name="statusID" id="statusID" value="">
-                    <label class="text-muted"c>Update Student Status</label>
+                    <label class="form-label">Update Student Status</label>
                     <button  type="submit" name="btn" value="Active" class="btn btn-success" >Active</button>
                     <button  type="submit" name="btn"  class="btn btn-primary" value="Suspended" >Suspended</button>
                     <button  type="submit" name="btn" class="btn btn-danger" value="Terminated">Terminated</button>
+                    </form>
                   </div>
                 </div>
-                </form>
+                <div class="col-6">
+                  <div class="info-item">
+                   <form action="/addService" method="post">
+                     <input type="hidden"  name="id" id="transportID" value="">
+                    <label class="form-label">Transport Services</label>
+                    <div class="col-6 d-flex">  
+                      <input type="number" class="form-control" id="transportAmount" name="amount" value="" required /> 
+                     <button  type="submit" name="btn" value="add" class="btn bi-plus-circle text-success"></button>
+                     <button  type="submit" name="btn" class="btn bi-trash text-danger" value="remove"></button>
+                    </div>               
+                  </form>
+                  </div>
+                </div>
+             
+                </div>
+                
              </div>
+
+      
 
             <ul class="nav nav-tabs" id="studentTabs">
              <li class="nav-item">
@@ -563,7 +593,7 @@
         <% found.forEach(function (foundItem) { %>
           {
             id: "<%= foundItem.enrollmentNo %>",
-            studentName: "<%= foundItem.name %>",
+            name: "<%= foundItem.name %>",
             fathersName: "<%= foundItem.parentName %>",
             motherName: "<%= foundItem.mother %>",
             dob: "<%= foundItem.dob %>",
@@ -578,6 +608,9 @@
             documents: "<%= foundItem.document %>",
             status: "<%= foundItem.status %>",
             date: "<%= foundItem.joiningDate %>",
+            transport: "<%= foundItem.transport %>",
+            rollno: "<%= foundItem.rollno %>",
+            section: "<%= foundItem.section %>"
           },
         <% }) %>
       ];
@@ -643,7 +676,7 @@
                <form action="/credential" method="post"> 
                  <tr>
                     <td>${student.id}</td>
-                    <td>${student.studentName}</td>
+                    <td>${student.name}</td>
                     <td>${student.fathersName}</td>
                     <td>${student.grade}</td>
                     <td><span class="status-badge ${student.status.toLowerCase()}">${student.status}</span></td>
@@ -651,7 +684,7 @@
                         <button class="action-btn edit" onclick="viewStudentDetails('${student.id}')">
                             <i class="bi bi-eye"></i> View
                         </button>
-                        <button class="action-btn generate" type="submit" name="id" value="${student.id}, ${student.email}, ${student.studentName}"  >
+                        <button class="action-btn generate" type="submit" name="id" value="${student.id}, ${student.email}, ${student.name}"  >
                             <i class="bi bi-key"></i> Generate
                         </button>
                     </td>
@@ -666,7 +699,7 @@
             if (student) {
                 // Populate student details
                 document.getElementById('studentEnrollment').textContent = student.id;
-                document.getElementById('studentName').textContent = student.studentName;
+                document.getElementById('studentName').textContent = student.name;
                 document.getElementById('studentFather').textContent = student.fathersName;
                 document.getElementById('studentMother').textContent = student.motherName;
                 document.getElementById('studentdob').textContent = student.dob;
@@ -683,6 +716,10 @@
                 document.getElementById('id-marksheet').value = student.id;
                 document.getElementById('name-marksheet').value = student.studentName;
                 document.getElementById('father-marksheet').value = student.fathersName;
+                document.getElementById('transportID').value = student.id;
+                document.getElementById('transportAmount').value = student.transport;
+                document.getElementById('rollno').textContent = student.rollno;
+                document.getElementById('section').textContent = student.section;
                 
                 const studentFees = fees.filter(f => f.id === studentId);
                 const tbody = document.getElementById("feeTableBody");

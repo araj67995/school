@@ -75,6 +75,7 @@
             </thead>
             <tbody>
               <% found.forEach(function(foundItem) { %>
+                  <% if (foundItem.status === "Pending") { %>
               <tr>
                 <td><%= foundItem.studentID %></td>
                 <td><%= foundItem.name %> <%= foundItem.lastname %></td>
@@ -112,7 +113,7 @@
                   <% }; %>
                 </td>
               </tr>
-              <% }) %>
+             <% } %> <% }); %>
             </tbody>
           </table>
         </div>
@@ -280,7 +281,7 @@
                         class="form-check-input"
                         type="checkbox"
                         name="documents"
-                        value="marksheet"
+                        value=" marksheet"
                       />
                       <label class="form-check-label">Previous Marksheet</label>
                     </div>
@@ -289,7 +290,7 @@
                         class="form-check-input"
                         type="checkbox"
                         name="documents"
-                        value="photo"
+                        value=" photo"
                       />
                       <label class="form-check-label"
                         >Passport Size Photo</label
@@ -300,7 +301,7 @@
                         class="form-check-input"
                         type="checkbox"
                         name="documents"
-                        value="id"
+                        value=" id"
                       />
                       <label class="form-check-label">ID Proof</label>
                     </div>
@@ -494,7 +495,7 @@
                         class="form-check-input"
                         type="checkbox"
                         name="documents"
-                        value="marksheet"
+                        value=" marksheet"
                       />
                       <label class="form-check-label">Previous Marksheet</label>
                     </div>
@@ -503,7 +504,7 @@
                         class="form-check-input"
                         type="checkbox"
                         name="documents"
-                        value="photo"
+                        value=" photo"
                       />
                       <label class="form-check-label"
                         >Passport Size Photo</label
@@ -514,7 +515,7 @@
                         class="form-check-input"
                         type="checkbox"
                         name="documents"
-                        value="id"
+                        value=" id"
                       />
                       <label class="form-check-label">ID Proof</label>
                     </div>
