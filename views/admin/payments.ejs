@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    
+  <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="text-center mb-4">
+            <h4 class="text-white">Admin Panel</h4>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+          <a class="nav-link" href="/admin">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/admission">
+            <i class="bi bi-person-plus"></i> Admissions
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/student">
+            <i class="bi bi-mortarboard"></i> Students
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/teacher">
+            <i class="bi bi-person-workspace"></i> Teachers
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/notice">
+            <i class="bi bi-megaphone"></i> Notices
+          </a>
+        </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/admin/payments" >
+                    <i class="bi bi-credit-card"></i> Payments
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <!-- Payment Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Payment Management</h2>
+            <button class="btn btn-success" onclick="showBulkDueModal()">
+                <i class="bi bi-calendar-plus"></i> Generate Monthly Dues
+            </button>
+        </div>
+
+        <!-- Student Search Section -->
+        <div class="data-table mb-4">
+            <h3 class="mb-3">Student Payment</h3>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Enter Enrollment Number</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="enrollmentNumber" placeholder="Enter enrollment number">
+                        <button class="btn btn-primary" onclick="searchStudent()">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Information Display -->
+            <div id="studentInfo" class="row" style="display: none;">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Student Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Student Name</label>
+                                    <p id="studentName" class="info-item"></p>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Class</label>
+                                    <p id="studentClass" class="info-item"></p>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Roll No</label>
+                                    <p id="studentRoll" class="info-item"></p>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Father's Name</label>
+                                    <p id="fatherName" class="info-item"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Options -->
+            <div id="paymentOptions" class="mt-4" style="display: none;">
+                <h4>Payment Options</h4>
+              <form method="post" action="/payment">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6>Tuition Fee</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Amount Due</label>
+                                        <p class="text-danger fw-bold">₹<span id="tuitionDue">0</span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Payment Amount</label>
+                                        <input type="number" class="form-control" id="tuitionPayment" name="tuition" placeholder="Enter amount">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6>Transport Fee</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Amount Due</label>
+                                        <p class="text-danger fw-bold">₹<span id="transportDue">0</span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Payment Amount</label>
+                                        <input type="number" class="form-control" id="transportPayment" name="transport" placeholder="Enter amount">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6>Exam Fee</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Amount Due</label>
+                                        <p class="text-danger fw-bold">₹<span id="examDue">0</span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Payment Amount</label>
+                                        <input type="number" class="form-control" id="examPayment" name="exam" placeholder="Enter amount">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6>Other Fees</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Amount Due</label>
+                                        <p class="text-danger fw-bold">₹<span id="otherDue">0</span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Payment Amount</label>
+                                        <input type="number" class="form-control" id="otherPayment" name="other" placeholder="Enter amount">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>Payment Method</h6>
+                            </div>
+                            <div class="card-body pb-0">
+                                <div class="info-item mb-3 d-flex">
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input" type="checkbox" name="methods" value="Cash" />
+                                        <label class="form-check-label">Cash</label>
+                                    </div>
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input" type="checkbox" name="methods" value="Online" />
+                                        <label class="form-check-label">Online</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="methods" value="Cheque" />
+                                        <label class="form-check-label">Cheque</label>
+                                    </div>
+                               </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>Payment Summary</h6>
+                            </div>
+                            <div class="card-body" id="payBtn">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Total Due:</strong> ₹<span id="totalDue">0</span></p>
+                                        <p><strong>Total Payment:</strong> ₹<span id="totalPayment">0</span></p>
+                                        <input type="hidden" id="totalPay" name="total">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Remaining:</strong> ₹<span id="remainingAmount">0</span></p>
+                                        <input type="hidden" id="remainingPay" name="remaining">
+                                    </div>
+                                </div>
+                                <input type="hidden" id="paymentId" name="id" value="">
+                                <input type="hidden" id="name" name="name" value="">
+                                <input type="hidden" id="father" name="father" value="">
+                                <button class="btn btn-success" type="submit" >
+                                    <i class="bi bi-check-circle"></i> Process Payment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+
+        <!-- Payment History -->
+        <div class="data-table"  style="max-height: 500px; overflow-y: auto">
+            <h3 class="mb-3">Recent Payments</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Receipt No.</th>
+                        <th>Student Name</th>
+                        <th>Enrollment No</th>
+                        <th>Payment Type</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentHistory">
+                  <% Fees.forEach(function(foundFee) { %> 
+                    <% if(foundFee.status === "Paid") {%> 
+                        <tr>
+                        <td><%= foundFee.receiptNo %></td>
+                        <td><%= foundFee.name %></td>
+                        <td><%= foundFee.enrollmentNo %></td>
+                        <td><%= foundFee.feeType%></td>
+                        <td><%= foundFee.total %></td>
+                        <td><span class="status-badge active">Paid</span></td>
+                    </tr>
+                     <% }; %>                    
+                 <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bulk Monthly Due Modal -->
+    <div class="modal fade" id="bulkDueModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <form id="bulkDueForm" method="post" action="/addBulk">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate Monthly Dues</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Month</label>
+                                <select class="form-select" name="month" required>
+                                    <option value="">Select Month</option>
+                                    <option value="January">January</option>
+                                    <option value="February">February</option>
+                                    <option value="March">March</option>
+                                    <option value="April">April</option>
+                                    <option value="May">May</option>
+                                    <option value="June">June</option>
+                                    <option value="July">July</option>
+                                    <option value="August">August</option>
+                                    <option value="September">September</option>
+                                    <option value="October">October</option>
+                                    <option value="November">November</option>
+                                    <option value="December">December</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Year</label>
+                                <input type="number" class="form-control" name="year" value="2025" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tuition Fee (per student)</label>
+                                <input type="number" class="form-control" name="tuitionFee" id="tuitionFee" value="5000"  required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Transport Fee (per student)</label>
+                                <input type="number" class="form-control" name="transportFee" id="transportFee" value="1500" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Exam Fee (per student)</label>
+                                <input type="number" class="form-control" name="examFee" id="examFee" value="1000" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Other Fees (per student)</label>
+                                <input type="number" class="form-control" name="otherFee" id="otherFee" value="500" required>
+                            </div>
+                            <input type="hidden" name="total" id="total" value="">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Select Classes</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="classes" value="NC" >
+                                    <label class="form-check-label">NC</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="classes" value="LKG" >
+                                    <label class="form-check-label">LKG</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="classes" value="UKG" >
+                                    <label class="form-check-label">UKG</label>
+                                </div>
+                                 <% for (let i = 1; i <= 12; i++) {  %>
+                                      <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="classes" value="<%= i %>">
+                                        <label class="form-check-label">Class <%= i %></label>
+                                    </div>
+                                 <% }  %>
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success" >Generate Dues</button>
+                </div>
+            </div>
+          </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample student data
+     const students = [
+        <% Students.forEach(function (foundItem) { %>
+          {
+            id: "<%= foundItem.enrollmentNo %>",
+            name: "<%= foundItem.name %>",
+            fathersName: "<%= foundItem.parentName %>",
+            grade: "<%= foundItem.grade %><%= foundItem.section %>",
+            rollno: "<%= foundItem.rollno %>",
+          },
+        <% }) %>
+      ];
+
+      const fees = [
+         <% Fees.forEach(function(foundFee) { %>
+            <% if(foundFee.status === "Dues") {%> 
+           {
+             feeid: "<%= foundFee._id %>",
+             id: "<%= foundFee.enrollmentNo %>",
+             receiptNo:  " <%= foundFee.receiptNo %>",
+             month: "<%= foundFee.month %>",
+             year: "<%= foundFee.year %>",
+             tuition: "<%= foundFee.tuition %>",
+            transport: "<%= foundFee.transport %>",
+             exam: "<%= foundFee.exam %>",
+             other: "<%= foundFee.other %>",
+            total: "<%= foundFee.total %>",
+             methods: "<%= foundFee.methods %>",
+             type: "<%= foundFee.feeType %>",
+             status:" <%= foundFee.status %>",
+           },
+        <% }; %>         
+       <% }); %>
+      ];
+
+        function searchStudent() {
+            const enrollmentNo = document.getElementById('enrollmentNumber').value;
+            const student = students.find(s => s.id === enrollmentNo);
+            const fee = fees.find(f => f.id === enrollmentNo);
+            
+            if (student) {
+                // Display student information
+                document.getElementById('studentName').textContent = student.name;
+                document.getElementById('studentClass').textContent = student.grade;
+                document.getElementById('studentRoll').textContent = student.rollno;
+                document.getElementById('fatherName').textContent = student.fathersName;
+                document.getElementById('paymentId').value = student.id;
+                document.getElementById('father').value= student.fathersName;
+                document.getElementById('name').value = student.name;
+                
+                // Display dues
+                document.getElementById('tuitionDue').textContent = fee.tuition;
+                document.getElementById('transportDue').textContent = fee.transport;
+                document.getElementById('examDue').textContent = fee.exam;
+                document.getElementById('otherDue').textContent = fee.other;
+                
+                // Show sections
+                document.getElementById('studentInfo').style.display = 'block';
+                document.getElementById('paymentOptions').style.display = 'block';
+                
+                // Calculate totals
+                calculateTotals();
+            } else {
+                alert('Student not found! Please check the enrollment number.');
+            }
+        }
+
+        function calculateTotals() {
+            const tuitionDue = parseInt(document.getElementById('tuitionDue').textContent);
+            const transportDue = parseInt(document.getElementById('transportDue').textContent);
+            const examDue = parseInt(document.getElementById('examDue').textContent);
+            const otherDue = parseInt(document.getElementById('otherDue').textContent);
+            
+            const tuitionPayment = parseInt(document.getElementById('tuitionPayment').value) || 0;
+            const transportPayment = parseInt(document.getElementById('transportPayment').value) || 0;
+            const examPayment = parseInt(document.getElementById('examPayment').value) || 0;
+            const otherPayment = parseInt(document.getElementById('otherPayment').value) || 0;
+            
+            const totalDue = tuitionDue + transportDue + examDue + otherDue;
+            const totalPayment = tuitionPayment + transportPayment + examPayment + otherPayment;
+            const remaining = totalDue - totalPayment;
+            
+            document.getElementById('totalDue').textContent = totalDue;
+            document.getElementById('totalPayment').textContent = totalPayment;
+            document.getElementById('remainingAmount').textContent = remaining;
+            document.getElementById("totalPay").value = totalPayment;
+            document.getElementById("remainingPay").value = remaining;
+
+        }
+
+        // Add event listeners for payment inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentInputs = ['tuitionPayment', 'transportPayment', 'examPayment', 'otherPayment'];
+            paymentInputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateTotals);
+            });
+        });
+
+        function calculateTotalsFee () {
+            const toInt = (val) => isNaN(parseInt(val)) ? 0 : parseInt(val);
+
+            const tuition = toInt(document.getElementById("tuitionFee").value);
+            const transport = toInt(document.getElementById("transportFee").value);
+            const exam = toInt(document.getElementById("examFee").value);
+            const other = toInt(document.getElementById("otherFee").value);
+
+            const total = tuition + transport + exam + other;
+            document.getElementById("total").value = total;
+        };
+
+        function processPayment() {
+            const totalPayment = parseInt(document.getElementById('totalPayment').textContent);
+            if (totalPayment > 0) {
+                alert('Payment processed successfully!');
+                // Reset form
+                document.getElementById('enrollmentNumber').value = '';
+                document.getElementById('studentInfo').style.display = 'none';
+                document.getElementById('paymentOptions').style.display = 'none';
+                
+                // Clear payment inputs
+                ['tuitionPayment', 'transportPayment', 'examPayment', 'otherPayment'].forEach(id => {
+                    document.getElementById(id).value = '';
+                });
+            } else {
+                alert('Please enter payment amounts!');
+            }
+        }
+
+        function showBulkDueModal() {
+            const modal = new bootstrap.Modal(document.getElementById('bulkDueModal'));
+            modal.show();
+        }
+
+        function generateBulkDues() {
+            const form = document.getElementById('bulkDueForm');
+            if (form.checkValidity()) {
+                const formData = new FormData(form);
+                const month = formData.get('month');
+                const year = formData.get('year');
+                const selectedClasses = formData.getAll('classes');
+                
+                alert(`Monthly dues generated for ${month} ${year} for classes: ${selectedClasses.join(', ')}`);
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('bulkDueModal'));
+                modal.hide();
+                form.reset();
+            } else {
+                form.reportValidity();
+            }
+        }
+
+        function validateForm(event) {
+            const checkboxes = document.querySelectorAll('input[name="methods"]:checked');
+            if (checkboxes.length === 0) {
+            alert("Please select at least one payment method.");
+            event.preventDefault(); // Stop form from submitting
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector("form"); // Adjust selector if needed
+            form.addEventListener("submit", validateForm);
+        });
+    </script>
+</body>
+</html>

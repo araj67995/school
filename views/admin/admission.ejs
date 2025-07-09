@@ -46,6 +46,11 @@
             <i class="bi bi-megaphone"></i> Notices
           </a>
         </li>
+         <li class="nav-item">
+                <a class="nav-link" href="/admin/payments" >
+                    <i class="bi bi-credit-card"></i> Payments
+                </a>
+        </li>
       </ul>
     </div>
 
@@ -74,10 +79,11 @@
               </tr>
             </thead>
             <tbody>
+             
               <% found.forEach(function(foundItem) { %>
-                  <% if (foundItem.status === "Pending") { %>
+                  <% if (foundItem.status === "Pending" || "Rejected") { %>
               <tr>
-                <td><%= foundItem.studentID %></td>
+                <td><%= foundItem._id %></td>
                 <td><%= foundItem.name %> <%= foundItem.lastname %></td>
                 <td><%= foundItem.grade %></td>
                 <td><%= foundItem.createdAt %></td>
@@ -92,18 +98,16 @@
                     <div class="col-md-3">
                       <button
                         class="action-btn edit"
-                        onclick="reviewAdmission('<%= foundItem.studentID %>')"
+                        onclick="reviewAdmission('<%= foundItem._id%>')"
                       >
                         <i class="bi bi-eye"></i>
                       </button>
                     </div>
                     <div class="col-md-3">
-                      <form action="/reject" method="post">
-                        <input type="hidden" name="ID" value="<%= foundItem.studentID %>" />
-                        <button type="submit" class="btn btn-danger bi bi-x">
-                        
-                        </button>
-                      </form>
+                       <form action="/reject" method="post">
+                        <input type="hidden" name="_id" value="<%= foundItem._id %>" />
+                        <button type="submit" class="btn btn-danger bi bi-x"></button>
+                       </form>
                     </div>
                   </div>
                   <% } else if (foundItem.status === "Approved") { %>
@@ -341,11 +345,11 @@
             <div class="modal-body">
               <div class="row mb-3">
                 <div class="col-md-6">
-                  <label class="form-label">Student ID</label>
+                  <label class="form-label">Form ID</label>
                   <input
                     type="text"
                     class="form-control"
-                    name="studentID"
+                    name="_id"
                     readonly
                   />
                 </div>
@@ -538,7 +542,7 @@
        const pendingAdmissions = [
         <% found.forEach(function (foundItem) { %>
           {
-            id: "<%= foundItem.studentID %>",
+            id: "<%= foundItem._id %>",
             studentName: "<%= foundItem.name %> <%= foundItem.lastname %>",
             fathersName: "<%= foundItem.parent %>",
             motherName: "<%= foundItem.mother %>",
@@ -603,7 +607,7 @@
               form.elements["previousSchool"].value= admission.previousSchool;
 
               form.elements["address"].value = admission.address;
-              form.elements["studentID"].value= admission.id;
+              form.elements["_id"].value= admission.id;
              
               // Set document checkboxes
               form.elements["documents"].forEach((checkbox) => {

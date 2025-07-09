@@ -29,7 +29,10 @@ const counterSchema = new mongoose.Schema({
   count: Number,
 });
 
-const Counter = mongoose.model("Counter", counterSchema);
+const reciptCounterSchema = new mongoose.Schema({
+  year: Number,
+  count: Number,
+});
 
 const rollCounterSchema = new mongoose.Schema({
   year: Number,
@@ -41,7 +44,24 @@ const rollCounterSchema = new mongoose.Schema({
   },
 });
 
+const ReciptNo = mongoose.model("Recipt-Counter", reciptCounterSchema);
+const Counter = mongoose.model("Counter", counterSchema);
 const RollNo = mongoose.model("Roll-Numbers", rollCounterSchema);
+
+async function generateRecipt(date) {
+   const d = date.getDate().toString().padStart(2, "0");
+   const m = (date.getMonth() + 1).toString().padStart(2, "0");
+   const year = date.getFullYear();
+
+   const counter =  await ReciptNo.findOneAndUpdate(
+    { year },
+    { $inc: { count: 1 } },
+    { new: true, upsert: true }
+   );
+
+  const number = String(counter.count).padStart(3, "0");
+  return `${year}${m}${d}${number}`
+}
 
 async function generateStudentId() {
   const year = new Date().getFullYear();
@@ -135,7 +155,6 @@ const admissionSchema = new mongoose.Schema(
     parentEmail: String,
     document: [String],
     status: String,
-    studentID: String,
     createdAt: {
       type: String,
       default: function () {
@@ -222,13 +241,19 @@ const feeSchema = new mongoose.Schema(
   {
     enrollmentNo: String,
     name: String,
+    father: String,
     grade: String,
     receiptNo: String,
     month: String,
-    amount: Number,
-    type: String,
-    methods: [String],
-    remark: String,
+    year: String,
+    tuition: Number,
+    transport: Number,
+    exam: Number,
+    other: Number,
+    total: Number,
+     feeType: [String],     // ✅ ensure this is an array
+   methods: [String],     // ✅ ensure this is an array
+    status: String,
     createdAt: {
       type: String,
       default: function () {
@@ -417,8 +442,6 @@ app.post("/admission", async (req, res) => {
     return res.render("failure");
   }
 
-  const studentID = await generateStudentId();
-
   const AdmissionForm = new Admission({
     name: firstName,
     lastname: lastName,
@@ -435,7 +458,6 @@ app.post("/admission", async (req, res) => {
     parentEmail,
     document: documents,
     status: "Pending",
-    studentID: studentID,
   });
 
   AdmissionForm.save()
@@ -454,13 +476,14 @@ app.get("/admin", async (req, res) => {
     const students = await Student.find();
     const teachers = await Teacher.find();
     const activeNotice = await Notice.find({status: "Active"});
-
+    const pendingAdmissions = await Admission.find({status: "Pending"})
     res.render("admin/dashboard", {
       Admissions: admissions,
       Notice: notices,
       Students: students,
       Teachers: teachers,
-      ActiveNotice: activeNotice
+      ActiveNotice: activeNotice,
+      pendingAdmissions: pendingAdmissions
     });
   } catch (err) {
     console.error("Error loading admin dashboard:", err);
@@ -486,7 +509,7 @@ app.get("/admin/admission", (req, res) => {
 // approve the pending admissions
 app.post("/reviewAdmission", async (req, res) => {
   const {
-    studentID,
+    _id,
     studentName,
     fathersName,
     mothersName,
@@ -502,6 +525,7 @@ app.post("/reviewAdmission", async (req, res) => {
     email,
   } = req.body;
 
+  const studentID = await generateStudentId();
   const x = await rollnoGenerater(grade);
   const [section, rollno] = x.split(",");
 
@@ -528,9 +552,7 @@ app.post("/reviewAdmission", async (req, res) => {
   student
     .save()
     .then(() => {
-      return Admission.findOneAndDelete(
-        { studentID: studentID },
-      );
+      return Admission.findOneAndDelete({ _id});
     })
     .then(() => {
       res.redirect("/admin/admission");
@@ -543,10 +565,12 @@ app.post("/reviewAdmission", async (req, res) => {
 
 // Reject the pending admission
 app.post("/reject", (req, res) => {
-  const { ID } = req.body;
+  const { _id } = req.body;
+
+  console.log(_id)
 
   return Admission.findOneAndUpdate(
-    { studentID: ID },
+    { _id },
     { status: "Rejected" },
     { new: true } // optional: returns the updated document
   ).then(() => {
@@ -650,10 +674,10 @@ app.post("/updateStatus", (req, res) => {
 
 // Add Transport
 app.post("/addService", (req, res) => {
-  const { id, amount, btn } = req.body;
+  const { id, btn } = req.body;
 
-  if (btn === "add") {
-    Student.updateOne({ enrollmentNo: id }, { transport: amount })
+  if (btn === "YES") {
+    Student.updateOne({ enrollmentNo: id }, { transport: "YES" })
       .then(() => {
         res.redirect("/admin/student");
       })
@@ -661,7 +685,7 @@ app.post("/addService", (req, res) => {
         console.log(err);
       });
   } else {
-    Student.updateOne({ enrollmentNo: id }, { transport: "" })
+    Student.updateOne({ enrollmentNo: id }, { transport: "NO" })
       .then(() => {
         res.redirect("/admin/student");
       })
@@ -672,49 +696,149 @@ app.post("/addService", (req, res) => {
 });
 
 // Add Fee
-app.post("/addFee", (req, res) => {
-  const {
-    receiptNo,
-    id,
-    name,
-    grade,
-    month,
-    amount,
-    feeType,
-    methods,
-    remark,
-  } = req.body;
+app.post("/addFee", async (req, res) => {
+  try {
+    const {
+      id,
+      grade,
+      name,
+      month,
+      amount,
+      feeType,
+      methods,
+      status,
+    } = req.body;
 
-  const fee = new Fee({
-    enrollmentNo: id,
-    name,
-    grade,
-    receiptNo,
-    month,
-    amount,
-    type: feeType,
-    methods,
-    remark,
-  });
+    // ✅ Parse amount safely
+    const totalAmount = parseInt(amount);
+    if (isNaN(totalAmount)) {
+      return res.status(400).send("❌ Invalid amount provided.");
+    }
 
-  fee.save();
+    // ✅ Ensure feeType and methods are arrays
+    const feeTypes = Array.isArray(feeType) ? feeType : (feeType ? [feeType] : []);
+    const paymentMethods = Array.isArray(methods) ? methods : (methods ? [methods] : []);
+
+    if (status === "Paid") {
+      const date = new Date();
+      const receiptNo = await generateRecipt(date);
+
+      const paidFee = new Fee({
+        enrollmentNo: id,
+        grade,
+        name,
+        receiptNo,
+        month,
+        total: totalAmount,
+        feeType: feeTypes,
+        methods: paymentMethods,
+        status,
+      });
+
+      await paidFee.save();
+
+    } else if (status === "Dues") {
+      const existingDues = await Fee.findOne({ enrollmentNo: id, status: "Dues" });
+
+      if (existingDues) {
+        existingDues.month += `, ${month}`;
+        existingDues.other = (existingDues.other || 0) + totalAmount;
+        existingDues.total = (existingDues.total || 0) + totalAmount;
+
+        existingDues.feeType = [...new Set([...existingDues.feeType, ...feeTypes])];
+        existingDues.methods = [...new Set([...existingDues.methods, ...paymentMethods])];
+
+        await existingDues.save();
+      } else {
+        const duesFee = new Fee({
+          enrollmentNo: id,
+          grade,
+          month,
+          other: totalAmount,
+          total: totalAmount,
+          feeType: feeTypes,
+          methods: paymentMethods,
+          status,
+        });
+
+        await duesFee.save();
+      }
+    }
+
+    res.redirect("/admin/student");
+
+  } catch (err) {
+    console.error("Error adding fee:", err);
+    res.status(500).send("Server error while adding fee");
+  }
 });
 
-// delete fee
+// Delete Fee
 app.post("/deleteFees", async (req, res) => {
   try {
     const { feeIds } = req.body;
-    const idsToDelete = Array.isArray(feeIds) ? feeIds : [feeIds]; // handles 1 or many
+    const idsToDelete = Array.isArray(feeIds) ? feeIds : [feeIds];
 
+    // Step 1: Get the fee records being deleted
+    const feesToDelete = await Fee.find({ _id: { $in: idsToDelete } });
+
+    // Step 2: Group deleted fees by enrollmentNo and sum the amounts
+    const grouped = {};
+
+    for (let fee of feesToDelete) {
+      const id = fee.enrollmentNo;
+      if (!grouped[id]) {
+        grouped[id] = { tuition: 0, transport: 0, exam: 0, other: 0, total: 0 };
+      }
+
+      grouped[id].tuition += fee.tuition || 0;
+      grouped[id].transport += fee.transport || 0;
+      grouped[id].exam += fee.exam || 0;
+      grouped[id].other += fee.other || 0;
+      grouped[id].total += fee.total || 0;
+    }
+
+    // Step 3: Update each "Dues" record for the student
+    for (let enrollmentNo in grouped) {
+      const existingDues = await Fee.findOne({ enrollmentNo, status: "Dues" });
+
+      if (existingDues) {
+        await Fee.findOneAndUpdate(
+          { enrollmentNo, status: "Dues" },
+          {
+            $inc: {
+              tuition: grouped[enrollmentNo].tuition,
+              transport: grouped[enrollmentNo].transport,
+              exam: grouped[enrollmentNo].exam,
+              other: grouped[enrollmentNo].other,
+              total: grouped[enrollmentNo].total
+            }
+          }
+        );
+      } else {
+        // Optional: if no Dues exists, create one
+        await Fee.create({
+          enrollmentNo,
+          status: "Dues",
+          tuition: grouped[enrollmentNo].tuition,
+          transport: grouped[enrollmentNo].transport,
+          exam: grouped[enrollmentNo].exam,
+          other: grouped[enrollmentNo].other,
+          total: grouped[enrollmentNo].total
+        });
+      }
+    }
+
+    // Step 4: Delete the fees
     await Fee.deleteMany({ _id: { $in: idsToDelete } });
 
-    // Redirect or respond as needed
-    res.redirect(`/admin/student`); // or render the modal again
+    res.redirect(`/admin/student`);
   } catch (error) {
     console.error("Error deleting fees:", error);
     res.status(500).send("Server error while deleting fees");
   }
 });
+
 
 // add attendence
 
@@ -1467,6 +1591,144 @@ app.post("/editNotice", (req, res) => {
   } else {
     res.status(400).send("Invalid action.");
   }
+});
+
+// Payment Method
+app.get("/admin/payments", async(req, res) => {
+
+ const students = await Student.find();
+ const fee = await Fee.find().sort({receiptNo: -1});
+
+  res.render("admin/payments", {
+    Students: students,
+    Fees : fee,
+  });
+});
+
+// add monthly dues in bulk
+app.post("/addBulk", async (req, res) => {
+  const { month, year, tuitionFee, transportFee, examFee, otherFee, classes, total } = req.body;
+  const toInt = (val) => isNaN(parseInt(val)) ? 0 : parseInt(val);
+
+  try {
+    const students = await Student.find({ grade: { $in: classes } });
+
+    for (let i = 0; i < students.length; i++) {
+      const student = students[i];
+      const enrollmentNo = student.enrollmentNo;
+
+      // Conditionally apply transport fee
+      const tFee = student.transport === "YES" ? toInt(transportFee) : 0;
+
+      // Calculate actual total for this student
+      const calculatedTotal = toInt(tuitionFee) + tFee + toInt(examFee) + toInt(otherFee);
+
+      const existingFee = await Fee.findOne({ enrollmentNo, status: "Dues", feeType:"Monthly" });
+
+      if (!existingFee) {
+        const fee = new Fee({
+          enrollmentNo,
+          grade: student.grade,
+          month,
+          year,
+          tuition: toInt(tuitionFee),
+          transport: tFee,
+          exam: toInt(examFee),
+          other: toInt(otherFee),
+          total: calculatedTotal,
+          methods: "",
+          status: "Dues",
+          feeType: "Monthly"
+        });
+
+        await fee.save();
+      } else {
+        const updatedFee = {
+          month: `${existingFee.month} ${month}`,
+          year: year,
+          tuition: toInt(existingFee.tuition) + toInt(tuitionFee),
+          transport: toInt(existingFee.transport) + tFee,
+          exam: toInt(existingFee.exam) + toInt(examFee),
+          other: toInt(existingFee.other) + toInt(otherFee),
+          total: toInt(existingFee.total) + calculatedTotal,
+          grade: existingFee.grade,
+          methods: existingFee.methods,
+          status: existingFee.status,
+          enrollmentNo: existingFee.enrollmentNo,
+          feeType: "Monthly"
+        };
+
+        await Fee.findOneAndReplace({ enrollmentNo, status: "Dues", feeType:"Monthly"  }, updatedFee);
+      }
+    }
+
+    res.status(200).send("Bulk fees added/updated successfully.");
+  } catch (err) {
+    console.error("Error in /addBulk:", err);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Payment From Payments Page
+
+app.post("/payment", async (req, res) => {
+   const {tuition, transport, exam, other, remaining, total, id, methods, name, father} = req.body;
+
+   const fee = await Fee.findOne({ enrollmentNo: id, status: "Dues", feeType:"Monthly"  });
+
+   var remainingTuition = fee.tuition - tuition;
+   var remainingTransport = fee.transport - transport;
+   var remainingExam = fee.exam - exam;
+   var remainingOther = fee.other - other;
+   const date = new Date();
+   const receiptNo = await generateRecipt(date);
+
+  await Fee.findOneAndUpdate(
+  { enrollmentNo: id, status: "Dues" },
+  {
+    $set: {
+      tuition: remainingTuition,
+      exam: remainingExam,
+      transport: remainingTransport,
+      other: remainingOther,
+      total: remaining,
+      month: "",
+    }
+  },
+  { new: true }
+ )
+ .then(() => {
+  const paid = new Fee ({
+    enrollmentNo: id,
+    grade: fee.grade,
+    month: fee.month,
+    receiptNo,
+    tuition,
+    transport,
+    exam,
+    other,
+    total,
+    status: "Paid",
+    methods,
+    name,
+    father,
+    feeType: "Monthly"
+  });
+
+  if(total <= 0){
+    res.send("Please Pay the Dues Amount")
+  }else{
+     paid.save().
+  then(() => {
+    // add generated receipt of payment here
+    res.redirect("/admin/payments");
+  });
+  }; 
+ })
+ .catch((err) => {
+  console.log(err);
+ });
+
 });
 
 app.listen(process.env.PORT || 3000, () => {

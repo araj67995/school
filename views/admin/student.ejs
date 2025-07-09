@@ -46,6 +46,11 @@
             <i class="bi bi-megaphone"></i> Notices
           </a>
         </li>
+         <li class="nav-item">
+                <a class="nav-link" href="/admin/payments" >
+                    <i class="bi bi-credit-card"></i> Payments
+                </a>
+          </li>
       </ul>
     </div>
 
@@ -241,9 +246,8 @@
                      <input type="hidden"  name="id" id="transportID" value="">
                     <label class="form-label">Transport Services</label>
                     <div class="col-6 d-flex">  
-                      <input type="number" class="form-control" id="transportAmount" name="amount" value="" required /> 
-                     <button  type="submit" name="btn" value="add" class="btn bi-plus-circle text-success"></button>
-                     <button  type="submit" name="btn" class="btn bi-trash text-danger" value="remove"></button>
+                     <button  type="submit" name="btn" id="yes" value="YES" class="btn">YES</button>
+                     <button  type="submit" name="btn" id="no" class="btn" value="NO">NO</button>
                     </div>               
                   </form>
                   </div>
@@ -290,7 +294,7 @@
                         <th>Month</th>
                         <th>Amount</th>
                         <th>Fee Type</th>
-                        <th>Remark</th>
+                        <th>Status</th>
                       </tr>
                     </thead>
                     <!-- Data of fee is added here -->
@@ -399,7 +403,7 @@
 <div class="modal fade" id="addFee" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form id="addFeeForm" method="post" action="/addFee"> <!-- Add correct backend route -->
+      <form id="addFeeForm" method="post" action="/addFee">
         <div class="modal-header">
           <h5 class="modal-title">Add Fee</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -408,17 +412,27 @@
         <div class="modal-body">
           <div class="row">
             <div class="col-md-6">
-              <div class="info-item mb-3">
-                <label class="form-label">Receipt No.</label>
-                <input type="text" class="form-control" name="receiptNo"  required />
-              </div>
               <input type="hidden" id="id" value="" name="id">
               <input type="hidden" id="name" value="" name="name">
               <input type="hidden" id="gradeFee" value="" name="grade">
- 
+
               <div class="info-item mb-3">
                 <label class="form-label">Month</label>
-                <input type="month" class="form-control" name="month" value="" required/>
+                <select class="form-select" name="month" required>
+                       <option value="">Select Month</option>
+                       <option value="January">January</option>
+                       <option value="February">February</option>
+                       <option value="March">March</option>
+                       <option value="April">April</option>
+                       <option value="May">May</option>
+                       <option value="June">June</option>
+                       <option value="July">July</option>
+                       <option value="August">August</option>
+                       <option value="September">September</option>
+                       <option value="October">October</option>
+                       <option value="November">November</option>
+                       <option value="December">December</option>
+                   </select>
               </div>
 
               <div class="info-item mb-3">
@@ -426,38 +440,34 @@
                 <input type="number" class="form-control" name="amount" required />
               </div>
 
-              <div class="info-item mb-3">
-                <label class="form-label">Fee Type</label>
-                <select class="form-select" name="feeType" required>
-                  <option value="Tution">Tuition</option>
-                  <option value="Transport">Transport</option>
-                  <option value="Examination">Examination</option>
-                  <option value="Admission">Admission</option>
-                  <option value="Miscellaneous">Miscellaneous</option>
-                </select>
+              <!-- Academic Fee Types -->
+              <div class="info-item mb-3" id="academicOptions">
+                <label class="form-label">Academic Fee Types</label>
+                <div class="form-check"><input class="form-check-input" type="checkbox" name="feeType" value="admission"><label class="form-check-label">Admission</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" name="feeType" value="miscellaneous"><label class="form-check-label">Miscellaneous</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" name="feeType" value="clc"><label class="form-check-label">CLC</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" name="feeType" value="tour"><label class="form-check-label">Tour</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" name="feeType" value="development"><label class="form-check-label">Development</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" name="feeType" value="library"><label class="form-check-label">Library</label></div>
               </div>
+
             </div>
 
             <div class="col-md-6">
               <div class="info-item mb-3">
                 <label class="form-label">Payment Method</label>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="methods" value="Cash" />
-                  <label class="form-check-label">Cash</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="methods" value="Online" />
-                  <label class="form-check-label">Online</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="methods" value="Cheque" />
-                  <label class="form-check-label">Cheque</label>
-                </div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" name="methods" value="Cash"><label class="form-check-label">Cash</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" name="methods" value="Online"><label class="form-check-label">Online</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" name="methods" value="Cheque"><label class="form-check-label">Cheque</label></div>
               </div>
 
               <div class="info-item mb-3">
-                <label class="form-label">Remark</label>
-                <textarea class="form-control" name="remark" rows="3" placeholder="Optional..."></textarea>
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status" required>
+                  <option>Select</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Dues">Dues</option>
+                </select>
               </div>
             </div>
           </div>
@@ -471,6 +481,7 @@
     </div>
   </div>
 </div>
+
 
 <!-- ADD MARKSHEET MODAL (Multiple Subjects Table) -->
 <div class="modal fade" id="addMarksheet" tabindex="-1">
@@ -620,11 +631,11 @@
            {
             feeid: "<%= foundFee._id %>",
             id: "<%= foundFee.enrollmentNo %>",
-             receiptNo:  " <%= foundFee.receiptNo %>",
-              month: "<%= foundFee.month %>",
-              amount: "<%= foundFee.amount %>",
-             type: "<%= foundFee.type %>",
-              remark:" <%= foundFee.remark %>",
+            receiptNo:  " <%= foundFee.receiptNo %>",
+            month: "<%= foundFee.month %>",
+            amount: "<%= foundFee.total%>",
+            type: "<%= foundFee.feeType %>",
+            status:" <%= foundFee.status %>",
            },         
        <% }); %>
       ];
@@ -665,33 +676,34 @@
   ];
 
   // Function to filter students by class
-        function filterStudents() {
-            const selectedClass = document.getElementById('classFilter').value;
-            const filteredStudents = selectedClass ? 
-                students.filter(student => student.grade === selectedClass) : 
-                students;
-            
-            const tbody = document.getElementById('studentTableBody');
-            tbody.innerHTML = filteredStudents.map(student => `
-               <form action="/credential" method="post"> 
-                 <tr>
-                    <td>${student.id}</td>
-                    <td>${student.name}</td>
-                    <td>${student.fathersName}</td>
-                    <td>${student.grade}</td>
-                    <td><span class="status-badge ${student.status.toLowerCase()}">${student.status}</span></td>
-                    <td>
-                        <button class="action-btn edit" onclick="viewStudentDetails('${student.id}')">
-                            <i class="bi bi-eye"></i> View
-                        </button>
-                        <button class="action-btn generate" type="submit" name="id" value="${student.id}, ${student.email}, ${student.name}"  >
-                            <i class="bi bi-key"></i> Generate
-                        </button>
-                    </td>
-                </tr>
+       function filterStudents() {
+    const selectedClass = document.getElementById('classFilter').value;
+    const filteredStudents = selectedClass ? 
+        students.filter(student => student.grade === selectedClass) : 
+        students;
+
+    const tbody = document.getElementById('studentTableBody');
+    tbody.innerHTML = filteredStudents.map(student => `
+        <tr>
+            <td>${student.id}</td>
+            <td>${student.name}</td>
+            <td>${student.fathersName}</td>
+            <td>${student.grade}</td>
+            <td><span class="status-badge ${student.status.toLowerCase()}">${student.status}</span></td>
+            <td>
+                <button class="action-btn edit" type="button" onclick="viewStudentDetails('${student.id}')">
+                    <i class="bi bi-eye"></i> View
+                </button>
+                <form action="/credential" method="post" style="display:inline;">
+                    <button class="action-btn generate" type="submit" name="id" value="${student.id},${student.email},${student.name}">
+                        <i class="bi bi-key"></i> Generate
+                    </button>
                 </form>
-            `).join('');
-        }
+            </td>
+        </tr>
+    `).join('');
+}
+
 
        // Function to view student details
         function viewStudentDetails(studentId) {
@@ -717,7 +729,6 @@
                 document.getElementById('name-marksheet').value = student.studentName;
                 document.getElementById('father-marksheet').value = student.fathersName;
                 document.getElementById('transportID').value = student.id;
-                document.getElementById('transportAmount').value = student.transport;
                 document.getElementById('rollno').textContent = student.rollno;
                 document.getElementById('section').textContent = student.section;
                 
@@ -733,7 +744,7 @@
                     <td>${fee.month}</td>
                     <td>${fee.amount}</td>
                     <td>${fee.type}</td>
-                    <td>${fee.remark}</td>
+                    <td>${fee.status}</td>
                   `;
                   tbody.appendChild(row);
                 });
@@ -780,6 +791,18 @@
                   });
                 });
                 
+                 const yes = document.getElementById("yes");
+                  const no = document.getElementById("no");
+                if(student.transport === "YES") {
+                  yes.classList.add("text-success");
+                  no.classList.remove("text-danger");
+                  no.style.opacity = 0.5;
+                } else {
+                  yes.classList.remove("text-success");
+                  yes.style.opacity = 0.5;
+                  no.classList.add("text-danger");
+                };
+
                 // Set status badge
                 const statusBadge = document.getElementById('studentStatus');
                 statusBadge.textContent = student.status;
@@ -923,6 +946,21 @@ function calculatePercentage() {
 
   percentage.value = percent + "%";
 }
+
+  function validateFeeType(event) {
+    const selected = document.querySelectorAll('input[name="feeType"]:checked');
+    if (selected.length === 0) {
+      alert("Please select at least one Fee Type.");
+      event.preventDefault(); // Block form submission
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("form"); // Change if you have a specific form ID/class
+    form.addEventListener("submit", validateFeeType);
+  });
+
+
 
 </script>
 </body>
