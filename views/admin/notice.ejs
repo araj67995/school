@@ -74,7 +74,7 @@
                         </tr>
                     </thead>
                     <tbody id="noticeTableBody">
-                      <form action="/editNotice" method="post">
+                      <form action="/admin/notice/editNotice" method="post">
                       <% Notice.forEach(function(found) { %>
                           <tr>
                             <td><%= found.title %></td>
@@ -98,7 +98,7 @@
     <!-- Add Notice Modal -->
 <div class="modal fade" id="addNoticeModal" tabindex="-1" aria-labelledby="addNoticeModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form id="noticeForm" method="post" action="/addNotice">
+    <form id="noticeForm" method="post" action="/admin/notice/addNotice">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="addNoticeModalLabel">Add New Notice</h5>

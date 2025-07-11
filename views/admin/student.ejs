@@ -74,8 +74,16 @@
               <% } %> <% } %>
             </select>
           </div>
+          <div class="col-md-3 d-flex">
+            <div class="input-group">
+                        <input class="form-input form-control " type="text" id="searchBar" placeholder="SRXX000XX" required />
+                        <button class="btn btn-primary" onclick="searchStudent()">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+              </div>
+          </div>
         </div>
-         <form action="/credential" method="post">
+         <form action="/admin/student/credential" method="post">
         <div class="data-table">
           <table class="table">
             <thead>
@@ -231,7 +239,7 @@
                  <div class="row ">
                 <div class="col-6">
                   <div class="info-item">
-                       <form action="/updateStatus" method="post">
+                       <form action="/admin/student/updateStatus" method="post">
                      <input type="hidden"  name="statusID" id="statusID" value="">
                     <label class="form-label">Update Student Status</label>
                     <button  type="submit" name="btn" value="Active" class="btn btn-success" >Active</button>
@@ -242,7 +250,7 @@
                 </div>
                 <div class="col-6">
                   <div class="info-item">
-                   <form action="/addService" method="post">
+                   <form action="/admin/student/addService" method="post">
                      <input type="hidden"  name="id" id="transportID" value="">
                     <label class="form-label">Transport Services</label>
                     <div class="col-6 d-flex">  
@@ -285,7 +293,7 @@
             </button>
         </div>
           </button>
-                <form id="deleteFeesForm" method="POST" action="/deleteFees">
+                <form id="deleteFeesForm" method="POST" action="/admin/student/deleteFees">
                   <table class="table">
                     <thead>
                       <tr>
@@ -312,7 +320,7 @@
                  </button>
                     </div>
                 <!-- Attendance records will be loaded here -->
-                 <form action="/deleteAttendence" method="post">
+                 <form action="/admin/student/deleteAttendence" method="post">
                   <table class="table">
                   <thead>
                     <tr>
@@ -354,7 +362,7 @@
               </ul>
                 <div class="tab-content mt-3">
                <div class="tab-pane fade" id="term1">
-               <form action="/deleteMarks" method="post" id="deleteFormTerm1">
+               <form action="/admin/student/deleteMarks" method="post" id="deleteFormTerm1">
                  <table class="table">
                   <thead>
                     <tr>
@@ -374,7 +382,7 @@
                 </div>
                  <div class="tab-content mt-3">
                <div class="tab-pane fade" id="term2">
-                <form action="/deleteMarks" method="post"  id="deleteFormTerm2">
+                <form action="/admin/student/deleteMarks" method="post"  id="deleteFormTerm2">
                   <table class="table">
                   <thead>
                     <tr>
@@ -403,7 +411,7 @@
 <div class="modal fade" id="addFee" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form id="addFeeForm" method="post" action="/addFee">
+      <form id="addFeeForm" method="post" action="/admin/student/addFee">
         <div class="modal-header">
           <h5 class="modal-title">Add Fee</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -487,7 +495,7 @@
 <div class="modal fade" id="addMarksheet" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form id="marksheetForm" action="/addMarksheet" method="post">
+      <form id="marksheetForm" action="/admin/student/addMarksheet" method="post">
         <div class="modal-header">
           <h5 class="modal-title">Add Marksheet</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -557,7 +565,7 @@
 <div class="modal fade" id="addAttendance" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form id="attendanceForm" action="/addAttendence" method="post">
+      <form id="attendanceForm" action="/admin/student/addAttendence" method="post">
         <div class="modal-header">
           <h5 class="modal-title">Add Attendance</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -694,7 +702,7 @@
                 <button class="action-btn edit" type="button" onclick="viewStudentDetails('${student.id}')">
                     <i class="bi bi-eye"></i> View
                 </button>
-                <form action="/credential" method="post" style="display:inline;">
+                <form action="/admin/student/credential" method="post" style="display:inline;">
                     <button class="action-btn generate" type="submit" name="id" value="${student.id},${student.email},${student.name}">
                         <i class="bi bi-key"></i> Generate
                     </button>
@@ -702,6 +710,42 @@
             </td>
         </tr>
     `).join('');
+}
+
+function searchStudent() {
+    const selectedId = document.getElementById('searchBar').value.trim();
+    
+    if (!selectedId) {
+        alert("Please enter a Student ID.");
+        return;
+    }
+
+    const filteredStudents = students.filter(student => student.id === selectedId);
+
+    const tbody = document.getElementById('studentTableBody');
+    tbody.innerHTML = filteredStudents.map(student => `
+        <tr>
+            <td>${student.id}</td>
+            <td>${student.name}</td>
+            <td>${student.fathersName}</td>
+            <td>${student.grade}</td>
+            <td><span class="status-badge ${student.status.toLowerCase()}">${student.status}</span></td>
+            <td>
+                <button class="action-btn edit" type="button" onclick="viewStudentDetails('${student.id}')">
+                    <i class="bi bi-eye"></i> View
+                </button>
+                <form action="/admin/student/credential" method="post" style="display:inline;">
+                    <button class="action-btn generate" type="submit" name="id" value="${student.id},${student.email},${student.name}">
+                        <i class="bi bi-key"></i> Generate
+                    </button>
+                </form>
+            </td>
+        </tr>
+    `).join('');
+
+    if (filteredStudents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center">No student found with ID "${selectedId}".</td></tr>`;
+    }
 }
 
 

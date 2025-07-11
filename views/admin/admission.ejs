@@ -70,10 +70,10 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Application ID</th>
                 <th>Student Name</th>
                 <th>Class</th>
                 <th>Applied Date</th>
+                <th>Mobile No.</th>
                 <th>Documents</th>
                 <th>Actions</th>
               </tr>
@@ -83,10 +83,10 @@
               <% found.forEach(function(foundItem) { %>
                   <% if (foundItem.status === "Pending" || "Rejected") { %>
               <tr>
-                <td><%= foundItem._id %></td>
                 <td><%= foundItem.name %> <%= foundItem.lastname %></td>
                 <td><%= foundItem.grade %></td>
                 <td><%= foundItem.createdAt %></td>
+                <td><%= foundItem.phone %></td>
                 <td>
                   <% foundItem.document.forEach(function(doc) { %>
                   <span class="document-status"><%= doc %></span>
@@ -104,7 +104,7 @@
                       </button>
                     </div>
                     <div class="col-md-3">
-                       <form action="/reject" method="post">
+                       <form action="/admin/admission/reject" method="post">
                         <input type="hidden" name="_id" value="<%= foundItem._id %>" />
                         <button type="submit" class="btn btn-danger bi bi-x"></button>
                        </form>
@@ -127,7 +127,7 @@
     <!-- Direct Admission Modal -->
     <div class="modal fade" id="directAdmissionModal" tabindex="-1">
       <div class="modal-dialog modal-lg">
-        <form id="directAdmissionForm" action="/directAdmission" method="post">
+        <form id="directAdmissionForm" action="/admin/admission/directAdmission" method="post">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">Direct Admission</h5>
@@ -329,7 +329,7 @@
     </div>
 
     <!-- Pending Admission Review Modal -->
-    <form id="pendingAdmissionForm" action="/reviewAdmission" method="post">
+    <form id="pendingAdmissionForm" action="/admin/admission/reviewAdmission" method="post">
       <div class="modal fade" id="pendingAdmissionModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
