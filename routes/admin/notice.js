@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const { requireAdmin } = require("../../utils/auth");
 
 const Notice = require("../../models/notice");
+
+// Apply authentication middleware to all admin notice routes
+router.use(requireAdmin);
 
 // Notice Section
 router.get("/", (req, res) => {

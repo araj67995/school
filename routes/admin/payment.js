@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const { requireAdmin } = require("../../utils/auth");
 
 const {Fee, Student} = require("../../models/student");
 const { generateRecipt} = require('../../utils/helpers');
+
+// Apply authentication middleware to all admin payment routes
+router.use(requireAdmin);
 
 // Payment Method
 router.get("/", async(req, res) => {

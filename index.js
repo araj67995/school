@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
+const session = require("express-session");
 
 const admissionRoutes = require("./routes/admission");
 const forgetRoutes = require("./routes/forget");
@@ -16,6 +17,7 @@ const adminStudentRoutes = require("./routes/admin/student");
 const adminTeacherRoutes = require("./routes/admin/teacher");
 const adminNoticeRoutes = require("./routes/admin/notice");
 const adminPaymentsRoutes = require("./routes/admin/payment");
+const { setUserData } = require("./utils/auth");
 
 const app = express();
 
@@ -28,6 +30,20 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static("public"));
+
+// Session configuration
+app.use(session({
+  secret: 'Welcome To your School',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    secure: false, // Set to true in production with HTTPS
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Global middleware to set user data
+app.use(setUserData);
 
 // Mount routes
 app.use("/", homeRoutes);

@@ -1,10 +1,14 @@
 const express = require("express");
-const router = express.Router();  // ← invoke the Router function
+const router = express.Router();
+const { requireAdmin } = require("../../utils/auth");
 
 const Admission = require("../../models/admission");
 const Notice = require("../../models/notice");
 const {Student} = require("../../models/student");
 const {Teacher} = require("../../models/teacher");
+
+// Apply authentication middleware to all admin routes
+router.use(requireAdmin);
 
 // Admin Routes
 router.get("/", async (req, res) => {
@@ -22,7 +26,8 @@ router.get("/", async (req, res) => {
       Students: students,
       Teachers: teachers,
       ActiveNotice: activeNotice,
-      pendingAdmissions: pendingAdmissions
+      pendingAdmissions: pendingAdmissions,
+      user: req.user
     });
   } catch (err) {
     console.error("Error loading admin dashboard:", err);

@@ -3260,3 +3260,29 @@ body {
     gap: 5px;
   }
 }
+
+/* Logout Button Styling */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e74c3c;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  background-color: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.logout-btn:hover {
+  background-color: #e74c3c;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+.logout-btn i {
+  font-size: 14px;
+}

@@ -1,6 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const router = express.Router();
+const { requireAdmin } = require("../../utils/auth");
 
 const saltRounds = 10;
 
@@ -12,6 +13,9 @@ const {
   generateCredentials,
 } = require("../../utils/helpers");
 const User = require("../../models/user");
+
+// Apply authentication middleware to all admin student routes
+router.use(requireAdmin);
 
 // Student Route.
 router.get("/", (req, res) => {

@@ -1,12 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
+const { requireAdmin } = require("../../utils/auth");
 
 const saltRounds = 10;
 
 const {Teacher, TeacherAttendance, TeacherLeave, TeacherSalary} = require("../../models/teacher");
 const User = require("../../models/user");
 const {genrateTeacherId, generateCredentials} = require('../../utils/helpers');
+
+// Apply authentication middleware to all admin teacher routes
+router.use(requireAdmin);
 
 router.get("/", (req, res) => {
   Teacher.find()

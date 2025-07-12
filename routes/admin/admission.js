@@ -1,9 +1,13 @@
 const express = require("express");
-const router = express.Router();  // ← invoke the Router function
+const router = express.Router();
+const { requireAdmin } = require("../../utils/auth");
 
 const Admission = require("../../models/admission");
 const {Student} = require("../../models/student");
 const {formatDateToDDMMYYYY, generateStudentId, rollnoGenerater} = require('../../utils/helpers');
+
+// Apply authentication middleware to all admin admission routes
+router.use(requireAdmin);
 
 router.get("/", (req, res) => {
   // find pending admission
