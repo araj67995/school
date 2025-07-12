@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const ejs = require("ejs");
@@ -33,7 +35,7 @@ app.use(express.static("public"));
 
 // Session configuration
 app.use(session({
-  secret: 'Welcome To your School',
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: { 

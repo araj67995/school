@@ -1,13 +1,23 @@
+require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const { requireAdmin } = require("../../utils/auth");
+const transporter = require("../../utils/mail");
 
 const saltRounds = 10;
 
-const {Teacher, TeacherAttendance, TeacherLeave, TeacherSalary} = require("../../models/teacher");
+const {
+  Teacher,
+  TeacherAttendance,
+  TeacherLeave,
+  TeacherSalary,
+} = require("../../models/teacher");
 const User = require("../../models/user");
-const {genrateTeacherId, generateCredentials} = require('../../utils/helpers');
+const {
+  genrateTeacherId,
+  generateCredentials,
+} = require("../../utils/helpers");
 
 // Apply authentication middleware to all admin teacher routes
 router.use(requireAdmin);
@@ -245,12 +255,10 @@ router.post("/teacher-salary/generate", async (req, res) => {
     // Check if salary already exists for this month
     const existingSalary = await TeacherSalary.findOne({ teacherId, month });
     if (existingSalary) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Salary already generated for this month",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Salary already generated for this month",
+      });
     }
 
     // Get teacher details
@@ -383,12 +391,10 @@ router.post("/teacher-salary/add", async (req, res) => {
     // Check if salary already exists for this month
     const existingSalary = await TeacherSalary.findOne({ teacherId, month });
     if (existingSalary) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Salary already exists for this month",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Salary already exists for this month",
+      });
     }
 
     // Calculate net salary
@@ -524,12 +530,10 @@ router.post("/teacher-salary/increase", async (req, res) => {
     });
   } catch (err) {
     console.error("Error increasing salary:", err);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error increasing salary: " + err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error increasing salary: " + err.message,
+    });
   }
 });
 
@@ -542,7 +546,10 @@ router.post("/update-status", async (req, res) => {
     if (!teacherId || !status) {
       return res
         .status(400)
-        .json({ success: false, message: "Teacher ID and status are required" });
+        .json({
+          success: false,
+          message: "Teacher ID and status are required",
+        });
     }
 
     // Get current teacher
@@ -556,11 +563,11 @@ router.post("/update-status", async (req, res) => {
     // Validate status
     const validStatuses = [
       "Active",
-      "Suspended", 
+      "Suspended",
       "On Leave",
       "Terminated",
       "Resigned",
-      "Retired"
+      "Retired",
     ];
 
     if (!validStatuses.includes(status)) {
@@ -577,21 +584,19 @@ router.post("/update-status", async (req, res) => {
     console.log(
       `Status updated for teacher ${teacherId} from ${oldStatus} to ${status}`
     );
-    
+
     res.json({
       success: true,
       message: "Status updated successfully",
       status: status,
-      oldStatus: oldStatus
+      oldStatus: oldStatus,
     });
   } catch (err) {
     console.error("Error updating teacher status:", err);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error updating teacher status: " + err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error updating teacher status: " + err.message,
+    });
   }
 });
 
@@ -604,28 +609,31 @@ router.post("/bulk-salary/preview", async (req, res) => {
     if (!month || !year || !statusFilters || statusFilters.length === 0) {
       return res
         .status(400)
-        .json({ success: false, message: "Month, year, and status filters are required" });
+        .json({
+          success: false,
+          message: "Month, year, and status filters are required",
+        });
     }
 
-    const monthStr = `${year}-${month.padStart(2, '0')}`;
+    const monthStr = `${year}-${month.padStart(2, "0")}`;
 
     // Find teachers with selected statuses
     const teachers = await Teacher.find({ status: { $in: statusFilters } });
-    
+
     // Filter out teachers who already have salary for this month
     const teachersToProcess = [];
     for (const teacher of teachers) {
-      const existingSalary = await TeacherSalary.findOne({ 
-        teacherId: teacher.teacherId, 
-        month: monthStr 
+      const existingSalary = await TeacherSalary.findOne({
+        teacherId: teacher.teacherId,
+        month: monthStr,
       });
-      
+
       if (!existingSalary) {
         teachersToProcess.push({
           teacherId: teacher.teacherId,
           name: teacher.name,
           status: teacher.status,
-          salary: teacher.salary
+          salary: teacher.salary,
         });
       }
     }
@@ -633,16 +641,14 @@ router.post("/bulk-salary/preview", async (req, res) => {
     res.json({
       success: true,
       teachersToProcess: teachersToProcess,
-      totalCount: teachersToProcess.length
+      totalCount: teachersToProcess.length,
     });
   } catch (err) {
     console.error("Error previewing bulk salary:", err);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error previewing bulk salary: " + err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error previewing bulk salary: " + err.message,
+    });
   }
 });
 
@@ -655,25 +661,28 @@ router.post("/bulk-salary/generate", async (req, res) => {
     if (!month || !year || !statusFilters || statusFilters.length === 0) {
       return res
         .status(400)
-        .json({ success: false, message: "Month, year, and status filters are required" });
+        .json({
+          success: false,
+          message: "Month, year, and status filters are required",
+        });
     }
 
-    const monthStr = `${year}-${month.padStart(2, '0')}`;
+    const monthStr = `${year}-${month.padStart(2, "0")}`;
     let processedCount = 0;
     let errors = [];
 
     // Find teachers with selected statuses
     const teachers = await Teacher.find({ status: { $in: statusFilters } });
-    
+
     // Generate salary for each teacher
     for (const teacher of teachers) {
       try {
         // Check if salary already exists for this month
-        const existingSalary = await TeacherSalary.findOne({ 
-          teacherId: teacher.teacherId, 
-          month: monthStr 
+        const existingSalary = await TeacherSalary.findOne({
+          teacherId: teacher.teacherId,
+          month: monthStr,
         });
-        
+
         if (existingSalary) {
           continue; // Skip if salary already exists
         }
@@ -722,10 +731,15 @@ router.post("/bulk-salary/generate", async (req, res) => {
 
         await salary.save();
         processedCount++;
-        
-        console.log(`Bulk salary generated for teacher ${teacher.teacherId} for ${monthStr}`);
+
+        console.log(
+          `Bulk salary generated for teacher ${teacher.teacherId} for ${monthStr}`
+        );
       } catch (error) {
-        console.error(`Error generating salary for teacher ${teacher.teacherId}:`, error);
+        console.error(
+          `Error generating salary for teacher ${teacher.teacherId}:`,
+          error
+        );
         errors.push(`Teacher ${teacher.teacherId}: ${error.message}`);
       }
     }
@@ -735,16 +749,14 @@ router.post("/bulk-salary/generate", async (req, res) => {
       message: `Bulk salary generation completed`,
       processedCount: processedCount,
       totalTeachers: teachers.length,
-      errors: errors
+      errors: errors,
     });
   } catch (err) {
     console.error("Error generating bulk salary:", err);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error generating bulk salary: " + err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error generating bulk salary: " + err.message,
+    });
   }
 });
 
@@ -753,29 +765,57 @@ router.post("/credential", async (req, res) => {
   try {
     const [id, email, name] = req.body.id.split(",");
     const pass = generateCredentials(id);
-    console.log(pass)
     const hashedPassword = await bcrypt.hash(pass, saltRounds);
 
     const oldUser = await User.findOne({ id });
 
     if (!oldUser) {
+      // Send credentials to teacher email
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Your Teacher ID and Login Credentials",
+        html: `
+          <p>Dear ${name},</p>
+          <p>Welcome to <strong>S.R Public School</strong>!</p>
+          <p>Here are your login credentials to access the login portal:</p>
+          <ul>
+            <li><strong>Teacher ID:</strong> ${id}</li>
+            <li><strong>Password:</strong> ${pass}</li>
+          </ul>
+          <p>Please keep this information confidential and do not share it with others.</p>
+          <p>Login here: <a href="https://your-school-portal.com/login">your-school-portal.com/login</a></p>
+          <br>
+          <p>Best regards,<br><strong>S.R Public Administration</strong></p>
+        `,
+      };
+
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log("Email sent to:", email);
+      } catch (err) {
+        console.error("Email sending error:", err);
+        return res.status(500).send("Failed to send email");
+      }
+
+      // Save teacher to database
       const user = new User({
         email,
         id,
         pass: hashedPassword,
         name,
-        role: "teacher"
+        role: "teacher",
       });
 
       await user.save();
-      res.redirect("/admin/teacher");
     } else {
-      console.log(oldUser.pass, oldUser.email, oldUser.id, oldUser.name);
-      res.redirect("/admin/teacher");
+      console.log("Teacher already exists:", oldUser);
     }
+
+    res.redirect("/admin/teacher");
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Server error");
+    console.error("Server error:", error);
+    res.status(500).send("Internal server error");
   }
 });
 

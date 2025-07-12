@@ -1,7 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const bcrypt = require("bcrypt");
 const router = express.Router();
 const { requireAdmin } = require("../../utils/auth");
+const transporter = require("../../utils/mail");
 
 const saltRounds = 10;
 
@@ -373,12 +375,41 @@ router.post("/credential", async (req, res) => {
   try {
     const [id, email, name] = req.body.id.split(",");
     const pass = generateCredentials(id);
-    console.log(pass);
     const hashedPassword = await bcrypt.hash(pass, saltRounds);
 
+    // Check if user already exists
     const oldUser = await User.findOne({ id });
 
     if (!oldUser) {
+      // Send email first
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Your Student ID and Login Credentials",
+        html: `
+          <p>Dear ${name},</p>
+          <p>Welcome to <strong>S.R Public School</strong>!</p>
+          <p>Here are your login credentials to access the student portal:</p>
+          <ul>
+            <li><strong>Student ID:</strong> ${id}</li>
+            <li><strong>Password:</strong> ${pass}</li>
+          </ul>
+          <p>Please make sure to keep this information confidential and do not share it with others.</p>
+          <p>You can log in at: <a href="https://your-school-portal.com/login">your-school-portal.com/login</a></p>
+          <br>
+          <p>Best regards,<br><strong>S.R Public Administration</strong></p>
+        `,
+      };
+
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log("Email sent to:", email);
+      } catch (err) {
+        console.error("Failed to send email:", err);
+        return res.status(500).send("Failed to send email");
+      }
+
+      // Save user only after email is sent
       const user = new User({
         email,
         id,
@@ -388,14 +419,14 @@ router.post("/credential", async (req, res) => {
       });
 
       await user.save();
-      res.redirect("/admin/student");
     } else {
-      console.log(oldUser.pass, oldUser.email, oldUser.id, oldUser.name);
-      res.redirect("/admin/student");
+      console.log("User already exists:", oldUser.id);
     }
+
+    res.redirect("/admin/student");
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Server error");
+    console.error("Server error:", error);
+    res.status(500).send("Internal server error");
   }
 });
 
