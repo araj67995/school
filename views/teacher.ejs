@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - S.R Public School</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Top Stats -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon salary-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>₹45,000</h3>
+                    <p>Monthly Salary</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon working-days-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>180</h3>
+                    <p>Total Working Days</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon absent-icon">
+                    <i class="fas fa-calendar-times"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>5</h3>
+                    <p>Absent Days</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- Teacher Profile Sidebar -->
+            <div class="profile-sidebar">
+                <div class="profile-header">
+                    <h2>Sarah Johnson</h2>
+                    <p>Mathematics Teacher</p>
+                </div>
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <i class="fas fa-id-card"></i>
+                        <p>
+                            <strong>Employee ID</strong>
+                            T2024001
+                        </p>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <p>
+                            <strong>Joining Date</strong>
+                            January 15, 2020
+                        </p>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-envelope"></i>
+                        <p>
+                            <strong>Email</strong>
+                            sarah.johnson@school.com
+                        </p>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-phone"></i>
+                        <p>
+                            <strong>Contact</strong>
+                            +91 98765 43210
+                        </p>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <p>
+                            <strong>Qualification</strong>
+                            M.Sc Mathematics
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Class Selection and Student List -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chalkboard-teacher"></i> Class Management</h3>
+                        <div class="class-selector">
+                            <select class="form-select" id="classSelector" onchange="loadStudents()">
+                                <option value="">Select Class</option>
+                                <option value="10A">Class 10th - Section A</option>
+                                <option value="10B">Class 10th - Section B</option>
+                                <option value="9A">Class 9th - Section A</option>
+                                <option value="9B">Class 9th - Section B</option>
+                                <option value="8A">Class 8th - Section A</option>
+                                <option value="8B">Class 8th - Section B</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="attendance-controls">
+                        <div class="date-selector">
+                            <label for="attendanceDate">Select Date:</label>
+                            <input type="date" id="attendanceDate" class="form-control" onchange="updateAttendanceDate()">
+                        </div>
+                        <div class="bulk-actions">
+                            <button class="action-btn primary-btn" onclick="markAllPresent()">
+                                <i class="fas fa-check-double"></i>
+                                Mark All Present
+                            </button>
+                            <button class="action-btn danger-btn" onclick="markAllAbsent()">
+                                <i class="fas fa-times"></i>
+                                Mark All Absent
+                            </button>
+                            <button class="action-btn success-btn" onclick="saveAttendance()">
+                                <i class="fas fa-save"></i>
+                                Save Attendance
+                            </button>
+                        </div>
+                    </div>
+                    <div class="student-list" id="studentList">
+                        <!-- Student list will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marks Management Modal -->
+    <div class="modal fade" id="marksModal" tabindex="-1" aria-labelledby="marksModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="marksModalLabel">Update Marks</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="marks-controls">
+                        <div class="term-selector">
+                            <label for="termSelect">Select Term:</label>
+                            <select class="form-select" id="termSelect" onchange="updateMarksTable()">
+                                <option value="first">First Term</option>
+                                <option value="mid">Mid Term</option>
+                                <option value="final">Final Term</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="marks-table-container">
+                        <table class="marks-table">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Written</th>
+                                    <th>Practical</th>
+                                    <th>Total</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marksTableBody">
+                                <!-- Marks will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveMarks()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/teacher.js">
+      
+    </script>
+</body>
+</html>

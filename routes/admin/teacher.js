@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
+
+const saltRounds = 10;
 
 const {Teacher, TeacherAttendance, TeacherLeave, TeacherSalary} = require("../../models/teacher");
+const User = require("../../models/user");
 const {genrateTeacherId, generateCredentials} = require('../../utils/helpers');
 
 router.get("/", (req, res) => {
@@ -737,6 +741,37 @@ router.post("/bulk-salary/generate", async (req, res) => {
         success: false,
         message: "Error generating bulk salary: " + err.message,
       });
+  }
+});
+
+// Store Credential
+router.post("/credential", async (req, res) => {
+  try {
+    const [id, email, name] = req.body.id.split(",");
+    const pass = generateCredentials(id);
+    console.log(pass)
+    const hashedPassword = await bcrypt.hash(pass, saltRounds);
+
+    const oldUser = await User.findOne({ id });
+
+    if (!oldUser) {
+      const user = new User({
+        email,
+        id,
+        pass: hashedPassword,
+        name,
+        role: "teacher"
+      });
+
+      await user.save();
+      res.redirect("/admin/teacher");
+    } else {
+      console.log(oldUser.pass, oldUser.email, oldUser.id, oldUser.name);
+      res.redirect("/admin/teacher");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server error");
   }
 });
 

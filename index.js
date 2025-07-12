@@ -7,6 +7,8 @@ const admissionRoutes = require("./routes/admission");
 const forgetRoutes = require("./routes/forget");
 const homeRoutes = require("./routes/home");
 const loginRoutes = require("./routes/login");
+const studentRoutes = require("./routes/student");
+const teacherRoutes = require("./routes/teacher");
 
 const adminRoutes = require("./routes/admin/dashboard");
 const adminAdmissionRoutes = require("./routes/admin/admission");
@@ -32,6 +34,8 @@ app.use("/", homeRoutes);
 app.use("/admission", admissionRoutes);
 app.use("/forget", forgetRoutes);
 app.use("/login", loginRoutes);
+app.use("/student", studentRoutes);
+app.use("/teacher", teacherRoutes);
 
 app.use("/admin", adminRoutes); // dashboard
 app.use("/admin/admission", adminAdmissionRoutes);

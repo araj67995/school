@@ -1,8 +1,17 @@
 const express = require("express");
-const router = express.Router(); 
+const bcrypt = require("bcrypt");
+const router = express.Router();
 
-const { Student, Fee, Attendance, Marksheet} = require("../../models/student");
-const { generateRecipt, generateStudentId, rollnoGenerater, generateCredentials} = require('../../utils/helpers');
+const saltRounds = 10;
+
+const { Student, Fee, Attendance, Marksheet } = require("../../models/student");
+const {
+  generateRecipt,
+  generateStudentId,
+  rollnoGenerater,
+  generateCredentials,
+} = require("../../utils/helpers");
+const User = require("../../models/user");
 
 // Student Route.
 router.get("/", (req, res) => {
@@ -71,16 +80,8 @@ router.post("/addService", (req, res) => {
 // Add Fee
 router.post("/addFee", async (req, res) => {
   try {
-    const {
-      id,
-      grade,
-      name,
-      month,
-      amount,
-      feeType,
-      methods,
-      status,
-    } = req.body;
+    const { id, grade, name, month, amount, feeType, methods, status } =
+      req.body;
 
     // ✅ Parse amount safely
     const totalAmount = parseInt(amount);
@@ -89,8 +90,16 @@ router.post("/addFee", async (req, res) => {
     }
 
     // ✅ Ensure feeType and methods are arrays
-    const feeTypes = Array.isArray(feeType) ? feeType : (feeType ? [feeType] : []);
-    const paymentMethods = Array.isArray(methods) ? methods : (methods ? [methods] : []);
+    const feeTypes = Array.isArray(feeType)
+      ? feeType
+      : feeType
+      ? [feeType]
+      : [];
+    const paymentMethods = Array.isArray(methods)
+      ? methods
+      : methods
+      ? [methods]
+      : [];
 
     if (status === "Paid") {
       const date = new Date();
@@ -109,17 +118,23 @@ router.post("/addFee", async (req, res) => {
       });
 
       await paidFee.save();
-
     } else if (status === "Dues") {
-      const existingDues = await Fee.findOne({ enrollmentNo: id, status: "Dues" });
+      const existingDues = await Fee.findOne({
+        enrollmentNo: id,
+        status: "Dues",
+      });
 
       if (existingDues) {
         existingDues.month += `, ${month}`;
         existingDues.other = (existingDues.other || 0) + totalAmount;
         existingDues.total = (existingDues.total || 0) + totalAmount;
 
-        existingDues.feeType = [...new Set([...existingDues.feeType, ...feeTypes])];
-        existingDues.methods = [...new Set([...existingDues.methods, ...paymentMethods])];
+        existingDues.feeType = [
+          ...new Set([...existingDues.feeType, ...feeTypes]),
+        ];
+        existingDues.methods = [
+          ...new Set([...existingDues.methods, ...paymentMethods]),
+        ];
 
         await existingDues.save();
       } else {
@@ -139,7 +154,6 @@ router.post("/addFee", async (req, res) => {
     }
 
     res.redirect("/admin/student");
-
   } catch (err) {
     console.error("Error adding fee:", err);
     res.status(500).send("Server error while adding fee");
@@ -184,8 +198,8 @@ router.post("/deleteFees", async (req, res) => {
               transport: grouped[enrollmentNo].transport,
               exam: grouped[enrollmentNo].exam,
               other: grouped[enrollmentNo].other,
-              total: grouped[enrollmentNo].total
-            }
+              total: grouped[enrollmentNo].total,
+            },
           }
         );
       } else {
@@ -197,7 +211,7 @@ router.post("/deleteFees", async (req, res) => {
           transport: grouped[enrollmentNo].transport,
           exam: grouped[enrollmentNo].exam,
           other: grouped[enrollmentNo].other,
-          total: grouped[enrollmentNo].total
+          total: grouped[enrollmentNo].total,
         });
       }
     }
@@ -211,7 +225,6 @@ router.post("/deleteFees", async (req, res) => {
     res.status(500).send("Server error while deleting fees");
   }
 });
-
 
 // add attendence
 
@@ -356,6 +369,8 @@ router.post("/credential", async (req, res) => {
   try {
     const [id, email, name] = req.body.id.split(",");
     const pass = generateCredentials(id);
+    console.log(pass);
+    const hashedPassword = await bcrypt.hash(pass, saltRounds);
 
     const oldUser = await User.findOne({ id });
 
@@ -363,8 +378,9 @@ router.post("/credential", async (req, res) => {
       const user = new User({
         email,
         id,
-        pass,
+        pass: hashedPassword,
         name,
+        role: "student",
       });
 
       await user.save();
