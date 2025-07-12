@@ -46,10 +46,10 @@
             <i class="bi bi-megaphone"></i> Notices
           </a>
         </li>
-         <li class="nav-item">
-                <a class="nav-link" href="/admin/payments" >
-                    <i class="bi bi-credit-card"></i> Payments
-                </a>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/payments">
+            <i class="bi bi-credit-card"></i> Payments
+          </a>
         </li>
       </ul>
     </div>
@@ -79,9 +79,8 @@
               </tr>
             </thead>
             <tbody>
-             
-              <% found.forEach(function(foundItem) { %>
-                  <% if (foundItem.status === "Pending" || "Rejected") { %>
+              <% found.forEach(function(foundItem) { %> <% if (foundItem.status
+              === "Pending" || "Rejected") { %>
               <tr>
                 <td><%= foundItem.name %> <%= foundItem.lastname %></td>
                 <td><%= foundItem.grade %></td>
@@ -104,10 +103,17 @@
                       </button>
                     </div>
                     <div class="col-md-3">
-                       <form action="/admin/admission/reject" method="post">
-                        <input type="hidden" name="_id" value="<%= foundItem._id %>" />
-                        <button type="submit" class="btn btn-danger bi bi-x"></button>
-                       </form>
+                      <form action="/admin/admission/reject" method="post">
+                        <input
+                          type="hidden"
+                          name="_id"
+                          value="<%= foundItem._id %>"
+                        />
+                        <button
+                          type="submit"
+                          class="btn btn-danger bi bi-x"
+                        ></button>
+                      </form>
                     </div>
                   </div>
                   <% } else if (foundItem.status === "Approved") { %>
@@ -117,7 +123,7 @@
                   <% }; %>
                 </td>
               </tr>
-             <% } %> <% }); %>
+              <% } %> <% }); %>
             </tbody>
           </table>
         </div>
@@ -127,7 +133,11 @@
     <!-- Direct Admission Modal -->
     <div class="modal fade" id="directAdmissionModal" tabindex="-1">
       <div class="modal-dialog modal-lg">
-        <form id="directAdmissionForm" action="/admin/admission/directAdmission" method="post">
+        <form
+          id="directAdmissionForm"
+          action="/admin/admission/directAdmission"
+          method="post"
+        >
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">Direct Admission</h5>
@@ -329,7 +339,11 @@
     </div>
 
     <!-- Pending Admission Review Modal -->
-    <form id="pendingAdmissionForm" action="/admin/admission/reviewAdmission" method="post">
+    <form
+      id="pendingAdmissionForm"
+      action="/admin/admission/reviewAdmission"
+      method="post"
+    >
       <div class="modal fade" id="pendingAdmissionModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
@@ -346,12 +360,7 @@
               <div class="row mb-3">
                 <div class="col-md-6">
                   <label class="form-label">Form ID</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    name="_id"
-                    readonly
-                  />
+                  <input type="text" class="form-control" name="_id" readonly />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Student Name</label>
@@ -536,120 +545,12 @@
       </div>
     </form>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-          // Sample data for pending admissions
-       const pendingAdmissions = [
-        <% found.forEach(function (foundItem) { %>
-          {
-            id: "<%= foundItem._id %>",
-            studentName: "<%= foundItem.name %> <%= foundItem.lastname %>",
-            fathersName: "<%= foundItem.parent %>",
-            motherName: "<%= foundItem.mother %>",
-            dob: "<%= foundItem.dob %>",
-            gender: "<%= foundItem.gender %>",
-            class: "<%= foundItem.grade %>",
-            contact: "<%= foundItem.phone %>",
-            email: "<%= foundItem.email%> ",
-            parentNo : "<%= foundItem.parentNo %>",
-            parentEmail: "<%= foundItem.parentEmail %>",
-            previousSchool: "<%= foundItem.previousSchool%>",
-            address: "<%= foundItem.address %>",
-            documents: {
-              <% if (foundItem.document.includes("previousReport")) { %>
-                marksheet: true,
-              <% } %>
-              <% if (foundItem.document.includes("idProof")) { %>
-                id: true,
-              <% } %>
-              <% if (foundItem.document.includes("clc")) { %>
-                clc: true,
-              <% } %>
-            }
-          },
-        <% }) %>
-      ];
-
-          function showDirectAdmissionModal() {
-            const modal = new bootstrap.Modal(
-              document.getElementById("directAdmissionModal")
-            );
-            modal.show();
-          }
-
-          function reviewAdmission(admissionId) {
-            const admission = pendingAdmissions.find((a) => a.id === admissionId);
-            if (admission) {
-              const modal = new bootstrap.Modal(
-                document.getElementById("pendingAdmissionModal")
-              );
-              const form = document.getElementById("pendingAdmissionForm");
-
-              // Populate form with admission data
-              form.elements["studentName"].value = admission.studentName;
-              form.elements["fathersName"].value = admission.fathersName;
-              form.elements["mothersName"].value = admission.motherName;
-               // ✅ Fix DOB format
-              const dob = new Date(admission.dob).toISOString().split("T")[0];
-               form.elements["dob"].value = dob;
-
-                 // ✅ Ensure these values are set after DOM loads
-              setTimeout(() => {
-                form.elements["gender"].value = admission.gender;
-                form.elements["grade"].value = admission.class;
-             }, 0); // ✅ Fix Gender and Class select fields
-
-              form.elements["contact"].value = admission.contact;
-              form.elements["email"].value= admission.email;
-              form.elements["parentContact"].value = admission.parentNo;
-              form.elements["parentEmail"].value= admission.parentEmail;
-
-              form.elements["previousSchool"].value= admission.previousSchool;
-
-              form.elements["address"].value = admission.address;
-              form.elements["_id"].value= admission.id;
-             
-              // Set document checkboxes
-              form.elements["documents"].forEach((checkbox) => {
-                checkbox.checked = admission.documents[checkbox.value];
-              });
-
-              modal.show();
-            }
-          }
-
-          function submitDirectAdmission() {
-            const form = document.getElementById("directAdmissionForm");
-            if (form.checkValidity()) {
-              // Handle form submission
-              alert("Direct admission submitted successfully!");
-              const modal = bootstrap.Modal.getInstance(
-                document.getElementById("directAdmissionModal")
-              );
-              modal.hide();
-              form.reset();
-            } else {
-              form.reportValidity();
-            }
-          }
-
-          function approveAdmission() {
-            // Handle admission approval
-            alert("Admission approved successfully!");
-            const modal = bootstrap.Modal.getInstance(
-              document.getElementById("pendingAdmissionModal")
-            );
-            modal.hide();
-          }
-
-          function rejectAdmission() {
-            // Handle admission rejection
-            alert("Admission rejected!");
-            const modal = bootstrap.Modal.getInstance(
-              document.getElementById("pendingAdmissionModal")
-            );
-            modal.hide();
-          }
+      const foundData = <%- JSON.stringify(found) %>;
     </script>
+    <script src="/js/admission.js"></script>
+
+    <!-- Bootstrap JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

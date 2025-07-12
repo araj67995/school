@@ -46,10 +46,10 @@
             <i class="bi bi-megaphone"></i> Notices
           </a>
         </li>
-           <li class="nav-item">
-                <a class="nav-link" href="/admin/payments" >
-                    <i class="bi bi-credit-card"></i> Payments
-                </a>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/payments">
+            <i class="bi bi-credit-card"></i> Payments
+          </a>
         </li>
       </ul>
     </div>
@@ -100,59 +100,57 @@
           </div>
         </div>
 
-       <!-- Notices Section -->
-<div class="row">
-  <div class="col-md-6">
-    <h3 class="mb-3">Recent Notices</h3>
-    <% Notice.forEach(function(notice) { %>
-      <% if(notice.status === "Active") { %>
-        <div class="notice-card col-6">
-          <div class="notice-title"><%= notice.title %></div>
-          <div class="notice-content">
-            <%= notice.remark %>
+        <!-- Notices Section -->
+        <div class="row">
+          <div class="col-md-6">
+            <h3 class="mb-3">Recent Notices</h3>
+            <% Notice.forEach(function(notice) { %> <% if(notice.status ===
+            "Active") { %>
+            <div class="notice-card col-6">
+              <div class="notice-title"><%= notice.title %></div>
+              <div class="notice-content"><%= notice.remark %></div>
+              <div class="notice-date">Date: <%= notice.date %></div>
+            </div>
+            <% } else { %>
+            <div class="notice-card col-6">
+              <a href="/admin/notice" class="nav-link">
+                Click me to Add new Notice</a
+              >
+            </div>
+            <% } %> <% }); %>
           </div>
-          <div class="notice-date">Date: <%= notice.date %></div>
+
+          <div class="col-md-6">
+            <h3 class="mb-3">Pending Admissions</h3>
+            <div class="data-table">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% Admissions.forEach(function(admission) { %> <% if
+                  (admission.status === "Pending") { %>
+                  <tr>
+                    <td><%= admission.name %> <%= admission.lastname %></td>
+                    <td><%= admission.grade %></td>
+                    <td><%= admission.createdAt %></td>
+                    <td>
+                      <span class="badge bg-warning"
+                        ><%= admission.status %></span
+                      >
+                    </td>
+                  </tr>
+                  <% } %> <% }); %>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-      <% } else { %> 
-         <div class="notice-card col-6">
-          <a href="/admin/notice" class="nav-link"> Click me to Add new Notice</a>
-         </div>
-        <% } %>
-    <% }); %>
-  </div>
-
-  <div class="col-md-6">
-    <h3 class="mb-3">Pending Admissions</h3>
-    <div class="data-table">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Class</th>
-            <th>Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% Admissions.forEach(function(admission) { %>
-            <% if (admission.status === "Pending") { %>
-              <tr>
-                <td><%= admission.name %> <%= admission.lastname %></td>
-                <td><%= admission.grade %></td>
-                <td><%= admission.createdAt %></td>
-                <td>
-                  <span class="badge bg-warning"><%= admission.status %></span>
-                </td>
-              </tr>
-            <% } %>
-          <% }); %>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-
       </div>
     </div>
   </body>
