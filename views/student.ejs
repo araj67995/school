@@ -1,220 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Dashboard - S.R Public School</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <div class="dashboard-container">
-        <!-- Top Stats -->
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-icon attendance-icon">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>85%</h3>
-                    <p>Attendance Rate</p>
-                </div>
+      <!-- Top Stats -->
+      <div class="stats-container">
+        <div class="stat-card">
+          <div class="stat-icon attendance-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div class="stat-info">
+            <h3><%= stats.attendanceRate %>%</h3>
+            <p>Attendance Rate</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon grade-icon">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <div class="stat-info">
+            <h3><%= stats.averageGrade %>%</h3>
+            <p>Average Grade</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon payment-icon">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+          <div class="stat-info">
+            <h3>₹<%= stats.totalFeesPaid.toLocaleString() %></h3>
+            <p>Total Fees Paid</p>
+          </div>
+        </div>
+        <% if (stats.pendingFees > 0) { %>
+        <div class="stat-card">
+          <div class="stat-icon pending-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div class="stat-info">
+            <h3>₹<%= stats.pendingFees.toLocaleString() %></h3>
+            <p>Pending Fees</p>
+          </div>
+        </div>
+        <% } %>
+      </div>
+
+      <div class="main-grid">
+        <!-- Student Profile Sidebar -->
+        <div class="profile-sidebar">
+          <div class="profile-header">
+            <h2><%= student.name %></h2>
+            <p>Class <%= student.grade %> - Section <%= student.section %></p>
+          </div>
+          <div class="profile-details">
+            <div class="detail-item">
+              <i class="fas fa-id-card"></i>
+              <p>
+                <strong>Enrollment No</strong>
+                <%= student.enrollmentNo %>
+              </p>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon grade-icon">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>92.5%</h3>
-                    <p>Average Grade</p>
-                </div>
+            <div class="detail-item">
+              <i class="fas fa-hashtag"></i>
+              <p>
+                <strong>Roll No</strong>
+                <%= student.rollno %>
+              </p>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon payment-icon">
-                    <i class="fas fa-money-bill-wave"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>₹15,000</h3>
-                    <p>Total Fees Paid</p>
-                </div>
+            <div class="detail-item">
+              <i class="fas fa-user"></i>
+              <p>
+                <strong>Father's Name</strong>
+                <%= student.parentName %>
+              </p>
             </div>
+            <div class="detail-item">
+              <i class="fas fa-phone"></i>
+              <p>
+                <strong>Contact</strong>
+                <%= student.phone %>
+              </p>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-envelope"></i>
+              <p>
+                <strong>Email</strong>
+                <%= student.email %>
+              </p>
+            </div>
+            <div class="detail-item">
+              <a href="/login/logout" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+              </a>
+            </div>
+          </div>
         </div>
 
-        <div class="main-grid">
-            <!-- Student Profile Sidebar -->
-            <div class="profile-sidebar">
-                <div class="profile-header">
-                    <h2>John Doe</h2>
-                    <p>Class 10th - Section A</p>
+        <!-- Main Content Area -->
+        <div class="main-content">
+          <!-- Academic Performance -->
+          <div class="content-card">
+            <div class="card-header">
+              <h3><i class="fas fa-chart-line"></i> Academic Performance</h3>
+              <div class="card-actions">
+                <% if (availableTerms.length > 0) { %>
+                <div class="term-selector">
+                  <select id="termSelector" onchange="updateMarksheet()">
+                    <% availableTerms.forEach(term => { %>
+                      <option value="<%= term %>"><%= term.charAt(0).toUpperCase() + term.slice(1) %> Term</option>
+                    <% }); %>
+                  </select>
                 </div>
-                <div class="profile-details">
-                    <div class="detail-item">
-                        <i class="fas fa-id-card"></i>
-                        <p>
-                            <strong>Enrollment No</strong>
-                            12345
-                        </p>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-hashtag"></i>
-                        <p>
-                            <strong>Roll No</strong>
-                            42
-                        </p>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-user"></i>
-                        <p>
-                            <strong>Father's Name</strong>
-                            James Doe
-                        </p>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-phone"></i>
-                        <p>
-                            <strong>Contact</strong>
-                            +91 98765 43210
-                        </p>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-envelope"></i>
-                        <p>
-                            <strong>Email</strong>
-                            john.doe@school.com
-                        </p>
-                    </div>
-                    <div class="detail-item">
-                        <a href="/login/logout" class="logout-btn">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Logout
-                        </a>
-                    </div>
-                </div>
+                <button
+                  class="action-btn primary-btn"
+                  onclick="downloadMarksheet()"
+                >
+                  <i class="fas fa-download"></i>
+                  Download Marksheet
+                </button>
+                <% } else { %>
+                <p class="text-muted">No marksheet data available</p>
+                <% } %>
+              </div>
             </div>
+            <div class="marksheet-container">
+              <div class="term-info mb-3">
+                <h4 class="term-title">Select a term to view marks</h4>
+                <p class="term-date">Choose from the dropdown above</p>
+              </div>
 
-            <!-- Main Content Area -->
-            <div class="main-content">
-                <!-- Academic Performance -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-chart-line"></i> Academic Performance</h3>
-                        <div class="card-actions">
-                            <div class="term-selector">
-                                <select id="termSelector" onchange="updateMarksheet()">
-                                    <option value="first">First Term</option>
-                                    <option value="mid">Mid Term</option>
-                                    <option value="final">Final Term</option>
-                                </select>
-                            </div>
-                            <button class="action-btn primary-btn" onclick="downloadMarksheet()">
-                                <i class="fas fa-download"></i>
-                                Download Marksheet
-                            </button>
-                        </div>
-                    </div>
-                    <div class="marksheet-container">
-                        <div class="term-info mb-3">
-                            <h4 class="term-title">First Term Examination</h4>
-                            <p class="term-date">August 2023</p>
-                        </div>
-                        <table class="marks-table">
-                            <thead>
-                                <tr>
-                                    <th>Subject</th>
-                                    <th>Written</th>
-                                    <th>Practical</th>
-                                    <th>Total</th>
-                                    <th>Grade</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Mathematics</td>
-                                    <td>75/80</td>
-                                    <td>10/20</td>
-                                    <td>85/100</td>
-                                    <td class="grade">A</td>
-                                </tr>
-                                <tr>
-                                    <td>Science</td>
-                                    <td>70/80</td>
-                                    <td>22/20</td>
-                                    <td>92/100</td>
-                                    <td class="grade">A+</td>
-                                </tr>
-                                <tr>
-                                    <td>English</td>
-                                    <td>65/80</td>
-                                    <td>13/20</td>
-                                    <td>78/100</td>
-                                    <td class="grade">B+</td>
-                                </tr>
-                                <tr>
-                                    <td>History</td>
-                                    <td>72/80</td>
-                                    <td>16/20</td>
-                                    <td>88/100</td>
-                                    <td class="grade">A</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Payment History -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-money-bill-wave"></i> Payment History</h3>
-                        <button class="action-btn primary-btn" onclick="downloadAllPayments()">
-                            <i class="fas fa-download"></i>
-                            Download All
-                        </button>
-                    </div>
-                    <div class="payment-list">
-                        <div class="payment-item">
-                            <div class="payment-info">
-                                <h4>Tuition Fee - January 2024</h4>
-                                <p class="payment-date">Jan 15, 2024</p>
-                            </div>
-                            <div class="payment-actions">
-                                <span class="payment-amount">₹5,000</span>
-                                <button class="action-btn secondary-btn" onclick="downloadReceipt('Jan 2024')">
-                                    <i class="fas fa-file-download"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="payment-item">
-                            <div class="payment-info">
-                                <h4>Tuition Fee - December 2023</h4>
-                                <p class="payment-date">Dec 15, 2023</p>
-                            </div>
-                            <div class="payment-actions">
-                                <span class="payment-amount">₹5,000</span>
-                                <button class="action-btn secondary-btn" onclick="downloadReceipt('Dec 2023')">
-                                    <i class="fas fa-file-download"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="payment-item">
-                            <div class="payment-info">
-                                <h4>Tuition Fee - November 2023</h4>
-                                <p class="payment-date">Nov 15, 2023</p>
-                            </div>
-                            <div class="payment-actions">
-                                <span class="payment-amount">₹5,000</span>
-                                <button class="action-btn secondary-btn" onclick="downloadReceipt('Nov 2023')">
-                                    <i class="fas fa-file-download"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+              <table class="marks-table table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th>Written</th>
+                    <th>Practical</th>
+                    <th>Total</th>
+                    <th>Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Dynamic content gets injected here -->
+                </tbody>
+              </table>
             </div>
+          </div>
+
+          <!-- Payment History -->
+          <div class="content-card">
+            <div class="card-header">
+              <h3><i class="fas fa-money-bill-wave"></i> Payment History</h3>
+              <% if (fees.length > 0) { %>
+              <button
+                class="action-btn primary-btn"
+                onclick="downloadAllPayments()"
+              >
+                <i class="fas fa-download"></i>
+                Download All
+              </button>
+              <% } %>
+            </div>
+            <div class="payment-list">
+              <% if (fees.length > 0) { %>
+                <% fees.forEach(fee => { %>
+                  <div class="payment-item">
+                    <div class="payment-info">
+                      <h4><%= fee.feeType.join(', ') %> - <%= fee.month %> <%= fee.year %></h4>
+                      <p class="payment-date"><%= fee.createdAt %></p>
+                      <p class="payment-status <%= fee.status.toLowerCase() %>-status">
+                        <i class="fas fa-<%= fee.status === 'Paid' ? 'check-circle' : 'clock' %>"></i>
+                        <%= fee.status %>
+                      </p>
+                    </div>
+                    <div class="payment-actions">
+                      <span class="payment-amount">₹<%= fee.total.toLocaleString() %></span>
+                      <button
+                        class="action-btn secondary-btn"
+                        onclick="downloadReceipt('<%= fee.month %> <%= fee.year %>')"
+                      >
+                        <i class="fas fa-file-download"></i>
+                      </button>
+                    </div>
+                  </div>
+                <% }); %>
+              <% } else { %>
+                <div class="no-data">
+                  <i class="fas fa-info-circle"></i>
+                  <p>No payment records found</p>
+                </div>
+              <% } %>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+
+    <script>
+      const feeData = <%- JSON.stringify(fees) %>;
+      const marksData = <%- JSON.stringify(marks) %>;
+      const availableTerms = <%- JSON.stringify(availableTerms) %>;
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/student.js"></script>
-</body>
+  </body>
 </html>

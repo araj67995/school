@@ -3,6 +3,12 @@ let timerInterval;
 let timeLeft = 30;
 let userEmail = "";
 
+const Users = UserData.map((foundItem) => ({
+  id: foundItem.id,
+  email: foundItem.email,
+  name: foundItem.name,
+}));
+
 // Generate random 6-digit OTP
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -23,11 +29,15 @@ async function verifyUserDetails(enrollment, name) {
   // This is a mock function - replace with actual API call
   return new Promise((resolve) => {
     setTimeout(() => {
-      // Mock database check
-      if (enrollment === "12345" && name.toLowerCase() === "john doe") {
+      const user = Users.find((d) => d.id === enrollment);
+      if(user){
+        document.getElementById("userId").value = user.id;
+      };
+
+      if (name.toLowerCase().trim(" ") === user.name.toLowerCase().trim(" ")) {
         resolve({
           success: true,
-          email: "john.doe@example.com",
+          email: user.email,
         });
       } else {
         resolve({
@@ -73,6 +83,7 @@ document
       showError("enrollmentError", "An error occurred. Please try again.");
     }
   });
+
 
 // Handle OTP input
 const otpInputs = document.querySelectorAll(".otp-input");
@@ -144,21 +155,7 @@ function startTimer() {
 }
 
 // Handle new password form submission
-document
-  .getElementById("newPasswordForm")
-  .addEventListener("submit", function (e) {
-    e.preventDefault();
-    const newPassword = document.getElementById("newPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
 
-    if (newPassword === confirmPassword) {
-      // In a real application, you would update the password in the database
-      alert("Password reset successful! Please login with your new password.");
-      window.location.href = "login.html";
-    } else {
-      showError("passwordError", "Passwords do not match. Please try again.");
-    }
-  });
 
 // Toggle password visibility
 document.querySelectorAll(".toggle-password").forEach((button) => {

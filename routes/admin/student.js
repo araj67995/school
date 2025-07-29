@@ -3,7 +3,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const router = express.Router();
 const { requireAdmin } = require("../../utils/auth");
-const transporter = require("../../utils/mail");
+const { transporter, sendPasswordStudent } = require("../../utils/mail");
 
 const saltRounds = 10;
 
@@ -234,26 +234,38 @@ router.post("/deleteFees", async (req, res) => {
 
 // add attendence
 
-router.post("/addAttendence", (req, res) => {
+router.post("/addAttendence", async (req, res) => {
   const { month, id, present, absent, percentage, remark } = req.body;
 
-  const attendence = new Attendance({
-    enrollmentNo: id,
-    month,
-    present,
-    absent,
-    percentage,
-    remark,
-  });
+  try {
+    const exist = await Attendance.findOne({ enrollmentNo: id, month });
 
-  attendence
-    .save()
-    .then(() => {
-      res.redirect("/admin/student");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+    if (exist) {
+      await Attendance.findOneAndUpdate(
+        { enrollmentNo: id, month },
+        {
+          present,
+          absent,
+          percentage,
+          remark,
+        }
+      );
+    } else {
+      const attendence = new Attendance({
+        enrollmentNo: id,
+        month,
+        present,
+        absent,
+        percentage,
+        remark,
+      });
+
+      await attendence.save();
+    }
+  } catch (err) {
+    console.error("Error in addAttendence:", err);
+    res.status(500).send("Server Error");
+  }
 });
 
 // delete attendence
@@ -282,11 +294,13 @@ router.post("/addMarksheet", async (req, res) => {
     studentGrade,
     father,
     term,
+    section,
     subject,
     theory,
     practical,
     total,
     grade,
+    rollno
   } = req.body;
 
   try {
@@ -328,6 +342,8 @@ router.post("/addMarksheet", async (req, res) => {
         fathersName: father,
         grade: studentGrade,
         term,
+        section,
+        rollno,
         subjects: newSubjects,
       });
 
@@ -381,28 +397,8 @@ router.post("/credential", async (req, res) => {
     const oldUser = await User.findOne({ id });
 
     if (!oldUser) {
-      // Send email first
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Your Student ID and Login Credentials",
-        html: `
-          <p>Dear ${name},</p>
-          <p>Welcome to <strong>S.R Public School</strong>!</p>
-          <p>Here are your login credentials to access the student portal:</p>
-          <ul>
-            <li><strong>Student ID:</strong> ${id}</li>
-            <li><strong>Password:</strong> ${pass}</li>
-          </ul>
-          <p>Please make sure to keep this information confidential and do not share it with others.</p>
-          <p>You can log in at: <a href="https://your-school-portal.com/login">your-school-portal.com/login</a></p>
-          <br>
-          <p>Best regards,<br><strong>S.R Public Administration</strong></p>
-        `,
-      };
-
       try {
-        await transporter.sendMail(mailOptions);
+        await sendPasswordStudent(id, name, pass, email);
         console.log("Email sent to:", email);
       } catch (err) {
         console.error("Failed to send email:", err);

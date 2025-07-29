@@ -23,7 +23,7 @@
           </div>
 
           <!-- User Details Section -->
-          <form id="userDetailsForm" class="login-form">
+          <form id="userDetailsForm" class="login-form" >  
             <div class="form-group">
               <div id="enrollmentError" class="error-message"></div>
               <label for="enrollment">
@@ -64,7 +64,7 @@
 
           <!-- OTP Verification Section (Hidden initially) -->
           <form id="otpForm" class="login-form" style="display: none">
-            <div class="form-group">
+            <div>
               <label>
                 <i class="fas fa-key"></i>
                 Enter OTP
@@ -128,13 +128,14 @@
           </form>
 
           <!-- New Password Section (Hidden initially) -->
-          <form id="newPasswordForm" class="login-form" style="display: none">
+          <form id="newPasswordForm" class="login-form" style="display: none" method="post" action="/forget/newPass">
             <div class="form-group">
               <label for="newPassword">
                 <i class="fas fa-lock"></i>
                 New Password
               </label>
               <div class="password-input">
+                <input type="hidden" id="userId" name="id" value="">
                 <input
                   type="password"
                   id="newPassword"
@@ -175,12 +176,15 @@
           </form>
 
           <div class="login-footer">
-            <a href="login.html">Back to Login</a>
+            <a href="/login">Back to Login</a>
           </div>
         </div>
       </div>
     </div>
 
+    <script> 
+       const UserData = <%- JSON.stringify(user) %>;
+    </script>
     <script src="/js/forget.js"></script>
   </body>
 </html>

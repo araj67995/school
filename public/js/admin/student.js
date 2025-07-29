@@ -161,12 +161,14 @@ function viewStudentDetails(studentId) {
     document.getElementById("grade").textContent = student.grade;
     document.getElementById("statusID").value = student.id;
     document.getElementById("grade-marksheet").value = student.grade;
+    document.getElementById("section-marksheet").value = student.section;
     document.getElementById("id-marksheet").value = student.id;
-    document.getElementById("name-marksheet").value = student.studentName;
+    document.getElementById("name-marksheet").value = student.name;
     document.getElementById("father-marksheet").value = student.fathersName;
     document.getElementById("transportID").value = student.id;
     document.getElementById("rollno").textContent = student.rollno;
     document.getElementById("section").textContent = student.section;
+    document.getElementById("rollNo-marksheet").value = student.rollno;
 
     const studentFees = fees.filter((f) => f.id === studentId);
     const tbody = document.getElementById("feeTableBody");

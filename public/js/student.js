@@ -1,3 +1,28 @@
+const marks = marksData.map((foundMarks) => ({
+  id: foundMarks.enrollmentNo,
+  marksId: foundMarks._id,
+  term: foundMarks.term,
+  createdAt: foundMarks.createdAt,
+  subjects: foundMarks.subjects.map((subj) => ({
+    subject: subj.subject,
+    theory: subj.theory,
+    practical: subj.practical,
+    total: subj.total,
+    grade: subj.grade,
+  })),
+}));
+
+// Helper function to get term title
+function getTermTitle(term) {
+  const termMap = {
+    'term1': 'First Term',
+    'term2': 'Second Term',
+    'term3': 'Third Term',
+    'term4': 'Fourth Term'
+  };
+  return termMap[term] || term.charAt(0).toUpperCase() + term.slice(1) + ' Term';
+}
+
 // Add any interactive functionality here
 document.addEventListener("DOMContentLoaded", function () {
   // Example: Add click event for download buttons
@@ -6,6 +31,11 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("Download will start shortly...");
     });
   });
+  
+  // Initialize marksheet if data is available
+  if (marks.length > 0) {
+    updateMarksheet();
+  }
 });
 
 function downloadMarksheet() {
@@ -26,64 +56,47 @@ function downloadAllPayments() {
 }
 
 function updateMarksheet() {
-  const term = document.getElementById("termSelector").value;
+  const termValue = document.getElementById("termSelector").value;
   const termInfo = document.querySelector(".term-info");
   const marksTable = document.querySelector(".marks-table tbody");
 
-  // Update term information
-  switch (term) {
-    case "first":
-      termInfo.innerHTML = `
-                        <h4 class="term-title">First Term Examination</h4>
-                        <p class="term-date">August 2023</p>
-                    `;
-      // Update marks for first term
-      updateMarks(
-        marksTable,
-        [
-          ["Mathematics", "75/80", "10/20", "85/100", "A"],
-          ["Science", "70/80", "22/20", "92/100", "A+"],
-          ["English", "65/80", "13/20", "78/100", "B+"],
-          ["History", "72/80", "16/20", "88/100", "A"],
-        ],
-        "85.75%"
-      );
-      break;
-    case "mid":
-      termInfo.innerHTML = `
-                        <h4 class="term-title">Mid Term Examination</h4>
-                        <p class="term-date">November 2023</p>
-                    `;
-      // Update marks for mid term
-      updateMarks(
-        marksTable,
-        [
-          ["Mathematics", "78/80", "18/20", "96/100", "A+"],
-          ["Science", "75/80", "20/20", "95/100", "A+"],
-          ["English", "70/80", "15/20", "85/100", "A"],
-          ["History", "76/80", "18/20", "94/100", "A+"],
-        ],
-        "92.50%"
-      );
-      break;
-    case "final":
-      termInfo.innerHTML = `
-                        <h4 class="term-title">Final Term Examination</h4>
-                        <p class="term-date">March 2024</p>
-                    `;
-      // Update marks for final term
-      updateMarks(
-        marksTable,
-        [
-          ["Mathematics", "80/80", "20/20", "100/100", "A+"],
-          ["Science", "78/80", "20/20", "98/100", "A+"],
-          ["English", "75/80", "18/20", "93/100", "A+"],
-          ["History", "79/80", "19/20", "98/100", "A+"],
-        ],
-        "97.25%"
-      );
-      break;
+  const foundTerm = marks.find((m) => m.term === termValue);
+
+  if (!foundTerm) {
+    marksTable.innerHTML = "<tr><td colspan='5'>No data available for selected term</td></tr>";
+    termInfo.innerHTML = `
+      <h4 class="term-title">No data available</h4>
+      <p class="term-date">Please select a different term</p>
+    `;
+    return;
   }
+
+  const marksArray = foundTerm.subjects.map((subj) => [
+    subj.subject,
+    `${subj.theory}`,
+    `${subj.practical}`,
+    `${subj.total}`,
+    subj.grade.join(", "),
+  ]);
+
+  const totalObtained = foundTerm.subjects.reduce((sum, subj) => sum + subj.total, 0);
+  const totalMax = foundTerm.subjects.length * 100;
+  const percentage = ((totalObtained / totalMax) * 100).toFixed(2) + "%";
+
+  const createdAt = new Date(foundTerm.createdAt);
+  const formattedDate = createdAt.toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const termTitle = getTermTitle(termValue);
+
+  termInfo.innerHTML = `
+    <h4 class="term-title">${termTitle}</h4>
+    <p class="term-date">${formattedDate}</p>
+  `;
+
+  updateMarks(marksTable, marksArray, percentage);
 }
 
 function updateMarks(table, marks, percentage) {
@@ -101,16 +114,10 @@ function updateMarks(table, marks, percentage) {
     )
     .join("");
 
-  // Add total percentage row
   table.innerHTML += `
-                <tr class="total-row">
-                    <td colspan="3"><strong>Total Percentage</strong></td>
-                    <td colspan="2"><strong>${percentage}</strong></td>
-                </tr>
-            `;
+    <tr class="total-row">
+        <td colspan="3"><strong>Total Percentage</strong></td>
+        <td colspan="2"><strong>${percentage}</strong></td>
+    </tr>
+  `;
 }
-
-// Initialize marksheet with first term data
-document.addEventListener("DOMContentLoaded", function () {
-  updateMarksheet();
-});

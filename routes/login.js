@@ -9,7 +9,7 @@ router.get("/", (req, res) => {
 
 router.post("/", async (req, res) => {
   const { id, password } = req.body;
-  
+
   try {
     const user = await User.findOne({ id });
     

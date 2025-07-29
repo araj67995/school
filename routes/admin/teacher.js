@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const { requireAdmin } = require("../../utils/auth");
-const transporter = require("../../utils/mail");
+const {transporter, sendPasswordTeacher} = require("../../utils/mail");
 
 const saltRounds = 10;
 
@@ -245,6 +245,149 @@ router.get("/teacher-salary/:teacherId", async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Error fetching salary history" });
+  }
+});
+
+// Update teacher class
+router.post("/update-class", async (req, res) => {
+  console.log('Update class endpoint called');
+  console.log('Request body:', req.body);
+  
+  const { teacherId, newGrade, newSection, changeReason } = req.body;
+  
+  if (!teacherId || !newGrade || !newSection) {
+    console.log('Missing required fields');
+    return res.status(400).json({ 
+      success: false, 
+      message: "Missing required fields: teacherId, newGrade, newSection" 
+    });
+  }
+  
+  try {
+    const teacher = await Teacher.findOne({ teacherId });
+    if (!teacher) {
+      console.log('Teacher not found:', teacherId);
+      return res.status(404).json({ success: false, message: "Teacher not found" });
+    }
+
+    console.log('Found teacher:', teacher.name);
+
+    // Store old values for history
+    const oldGrade = teacher.grade;
+    const oldSection = teacher.section;
+
+    // Update teacher's class and section
+    teacher.grade = newGrade;
+    teacher.section = newSection;
+    await teacher.save();
+
+    console.log(`Teacher ${teacherId} class changed from ${oldGrade}-${oldSection} to ${newGrade}-${newSection}. Reason: ${changeReason}`);
+
+    res.json({ success: true, message: "Class updated successfully" });
+  } catch (err) {
+    console.error("Error updating teacher class:", err);
+    res.status(500).json({ success: false, message: "Error updating class" });
+  }
+});
+
+// Update teacher section
+router.post("/update-section", async (req, res) => {
+  console.log('Update section endpoint called');
+  console.log('Request body:', req.body);
+  
+  const { teacherId, newSection, changeReason } = req.body;
+  
+  if (!teacherId || !newSection) {
+    console.log('Missing required fields');
+    return res.status(400).json({ 
+      success: false, 
+      message: "Missing required fields: teacherId, newSection" 
+    });
+  }
+  
+  try {
+    const teacher = await Teacher.findOne({ teacherId });
+    if (!teacher) {
+      console.log('Teacher not found:', teacherId);
+      return res.status(404).json({ success: false, message: "Teacher not found" });
+    }
+
+    console.log('Found teacher:', teacher.name);
+
+    // Store old value for history
+    const oldSection = teacher.section;
+
+    // Update teacher's section
+    teacher.section = newSection;
+    await teacher.save();
+
+    console.log(`Teacher ${teacherId} section changed from ${oldSection} to ${newSection}. Reason: ${changeReason}`);
+
+    res.json({ success: true, message: "Section updated successfully" });
+  } catch (err) {
+    console.error("Error updating teacher section:", err);
+    res.status(500).json({ success: false, message: "Error updating section" });
+  }
+});
+
+// Add new class assignment
+router.post("/add-class", async (req, res) => {
+  const { teacherId, grade, section, subject, effectiveFrom, remarks } = req.body;
+  try {
+    const teacher = await Teacher.findOne({ teacherId });
+    if (!teacher) {
+      return res.status(404).json({ success: false, message: "Teacher not found" });
+    }
+
+    // For now, we'll just log the additional class assignment
+    // In a full implementation, you might want to create a separate model for multiple class assignments
+    console.log(`Additional class assignment for teacher ${teacherId}: ${grade}-${section} (${subject || 'Same subject'}) effective from ${effectiveFrom}. Remarks: ${remarks}`);
+
+    res.json({ success: true, message: "Class assignment added successfully" });
+  } catch (err) {
+    console.error("Error adding class assignment:", err);
+    res.status(500).json({ success: false, message: "Error adding class assignment" });
+  }
+});
+
+// Get additional classes for a teacher
+router.get("/additional-classes/:teacherId", async (req, res) => {
+  const { teacherId } = req.params;
+  try {
+    // For now, return empty array since we haven't implemented multiple class assignments yet
+    // In a full implementation, you would query a separate model for additional class assignments
+    res.json({ success: true, classes: [] });
+  } catch (err) {
+    console.error("Error fetching additional classes:", err);
+    res.status(500).json({ success: false, message: "Error fetching additional classes" });
+  }
+});
+
+// Get class history for a teacher
+router.get("/class-history/:teacherId", async (req, res) => {
+  const { teacherId } = req.params;
+  try {
+    // For now, return empty array since we haven't implemented class history tracking yet
+    // In a full implementation, you would query a separate model for class change history
+    res.json({ success: true, history: [] });
+  } catch (err) {
+    console.error("Error fetching class history:", err);
+    res.status(500).json({ success: false, message: "Error fetching class history" });
+  }
+});
+
+// Remove class assignment
+router.post("/remove-class", async (req, res) => {
+  const { classId } = req.body;
+  try {
+    // For now, just return success since we haven't implemented multiple class assignments yet
+    // In a full implementation, you would delete the class assignment from a separate model
+    console.log(`Removing class assignment with ID: ${classId}`);
+    
+    res.json({ success: true, message: "Class assignment removed successfully" });
+  } catch (err) {
+    console.error("Error removing class assignment:", err);
+    res.status(500).json({ success: false, message: "Error removing class assignment" });
   }
 });
 
@@ -771,27 +914,8 @@ router.post("/credential", async (req, res) => {
 
     if (!oldUser) {
       // Send credentials to teacher email
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Your Teacher ID and Login Credentials",
-        html: `
-          <p>Dear ${name},</p>
-          <p>Welcome to <strong>S.R Public School</strong>!</p>
-          <p>Here are your login credentials to access the login portal:</p>
-          <ul>
-            <li><strong>Teacher ID:</strong> ${id}</li>
-            <li><strong>Password:</strong> ${pass}</li>
-          </ul>
-          <p>Please keep this information confidential and do not share it with others.</p>
-          <p>Login here: <a href="https://your-school-portal.com/login">your-school-portal.com/login</a></p>
-          <br>
-          <p>Best regards,<br><strong>S.R Public Administration</strong></p>
-        `,
-      };
-
       try {
-        await transporter.sendMail(mailOptions);
+        await sendPasswordTeacher(id, email, pass, name);
         console.log("Email sent to:", email);
       } catch (err) {
         console.error("Email sending error:", err);

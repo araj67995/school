@@ -92,6 +92,7 @@ const marksSchema = new mongoose.Schema({
   name: { type: String, required: true },
   fathersName: { type: String },
   grade: { type: String, required: true },
+  section: {type: String},
   rollno: { type: String },
   term: { type: String, required: true }, // "term1", "term2", etc.
   subjects: [subjectSchema],

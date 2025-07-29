@@ -1683,16 +1683,16 @@ body {
 /* OTP Input Styles */
 .otp-inputs {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
 .otp-input {
-  width: 45px;
-  height: 45px;
+  width: 25px;
+  height: 25px;
   text-align: center;
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   font-weight: 600;
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
@@ -1752,13 +1752,13 @@ body {
 /* Responsive Design for OTP */
 @media (max-width: 767px) {
   .otp-inputs {
-    gap: 8px;
+    gap: 6px;
   }
 
   .otp-input {
-    width: 40px;
-    height: 40px;
-    font-size: 1.1rem;
+    width: 25px;
+    height: 25px;
+    font-size: 0.8rem;
   }
 
   .resend-otp {
@@ -3285,4 +3285,142 @@ body {
 
 .logout-btn i {
   font-size: 14px;
+}
+
+/* Pending fees status */
+.pending-icon {
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+}
+
+/* Payment status styles */
+.payment-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+.paid-status {
+  color: #4caf50;
+}
+
+.pending-status {
+  color: #ff9800;
+}
+
+.payment-status i {
+  font-size: 0.9rem;
+}
+
+/* No data message */
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-light);
+}
+
+.no-data i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.no-data p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Marksheet container improvements */
+.marksheet-container {
+  min-height: 200px;
+}
+
+.term-info {
+  border-bottom: 2px solid var(--light-blue);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .payment-status {
+    font-size: 0.8rem;
+  }
+  
+  .no-data {
+    padding: 1rem;
+  }
+  
+  .no-data i {
+    font-size: 2rem;
+  }
+}
+
+.logout-btn i {
+  margin-right: 8px;
+}
+
+/* Teacher dashboard specific styles */
+.present-icon {
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+}
+
+/* No data message for teacher dashboard */
+.no-class-selected {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.no-class-selected::before {
+  content: "📚";
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Monthly attendance specific styles */
+.attendance-controls .date-selector {
+  margin-bottom: 1rem;
+}
+
+.attendance-controls .date-selector label {
+  font-weight: 500;
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.attendance-controls .date-selector input[type="month"] {
+  border: 2px solid var(--light-blue);
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.attendance-controls .date-selector input[type="month"]:focus {
+  border-color: var(--primary-blue);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+}
+
+/* Responsive improvements for teacher dashboard */
+@media (max-width: 768px) {
+  .attendance-controls .bulk-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .attendance-controls .bulk-actions .action-btn {
+    width: 100%;
+  }
+  
+  .no-class-selected {
+    padding: 1rem;
+  }
 }
