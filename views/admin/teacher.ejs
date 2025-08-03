@@ -408,14 +408,6 @@
                   >Attendance</a
                 >
               </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  data-bs-toggle="tab"
-                  href="#classManagement"
-                  >Class Management</a
-                >
-              </li>
             </ul>
             <div class="tab-content mt-3">
               <div class="tab-pane fade show active" id="teacherInfo">
@@ -560,7 +552,7 @@
                 <div id="attendanceSummary" class="mt-3 mb-3" style="display: none;">
                   <div class="row">
                     <div class="col-md-3">
-                      <div class="card text-center">
+                      <div class="card text-center">   
                         <div class="card-body">
                           <h5 class="card-title text-success" id="presentCount">0</h5>
                           <p class="card-text">Present</p>
@@ -1069,138 +1061,7 @@
       </div>
     </div>
 
-    <!-- Add New Class Modal -->
-    <div class="modal fade" id="addNewClassModal" tabindex="-1">
-      <div class="modal-dialog">
-        <form id="addNewClassForm">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Add New Class Assignment</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-              <input type="hidden" id="addClassTeacherId" name="teacherId">
-              <div class="mb-3">
-                <label class="form-label">Class</label>
-                <select class="form-select" name="grade" id="addClassGradeSelect" required>
-                  <option value="">Select Class</option>
-                  <option value="NC">NC</option>
-                  <option value="LKG">LKG</option>
-                  <option value="UKG">UKG</option>
-                  <% for (let i = 1; i <= 11; i++) { if (i !== 10) { %>
-                  <option value="<%= i %>">Class <%= i %></option>
-                  <% } } %>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Section</label>
-                <input type="text" class="form-control" name="section" id="addClassSectionInput" required />
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Subject (Optional)</label>
-                <input type="text" class="form-control" name="subject" id="addClassSubjectInput" placeholder="Leave empty to use current subject" />
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Effective From</label>
-                <input type="date" class="form-control" name="effectiveFrom" required />
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Remarks</label>
-                <textarea class="form-control" name="remarks" rows="3" placeholder="Any additional notes"></textarea>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-success">Add Class</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Class Management Tab Content -->
-    <div class="tab-pane fade" id="classManagement">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="mb-0">Class Assignments</h5>
-        <button class="btn btn-success" onclick="openAddNewClassModal()">
-          <i class="bi bi-plus-circle"></i> Add New Class
-        </button>
-      </div>
-      
-      <div class="row mb-3">
-        <div class="col-md-12">
-          <div class="alert alert-info">
-            <strong>Current Assignment:</strong> 
-            <span id="currentClassAssignment">Loading...</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h6 class="mb-0">Primary Class</h6>
-            </div>
-            <div class="card-body">
-              <div class="info-item">
-                <label class="text-muted">Class</label>
-                <p class="mb-2" id="primaryClass"></p>
-              </div>
-              <div class="info-item">
-                <label class="text-muted">Section</label>
-                <p class="mb-2" id="primarySection"></p>
-              </div>
-              <div class="info-item">
-                <label class="text-muted">Subject</label>
-                <p class="mb-2" id="primarySubject"></p>
-              </div>
-              <div class="mt-3">
-                <button class="btn btn-sm btn-outline-primary" onclick="openEditClassModal()">
-                  <i class="bi bi-pencil"></i> Edit Class
-                </button>
-                <button class="btn btn-sm btn-outline-secondary" onclick="openEditSectionModal()">
-                  <i class="bi bi-pencil"></i> Edit Section
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h6 class="mb-0">Additional Classes</h6>
-            </div>
-            <div class="card-body">
-              <div id="additionalClassesList">
-                <p class="text-muted">No additional classes assigned</p>
-              </div>
-              <div class="mt-3">
-                <button class="btn btn-sm btn-success" onclick="openAddNewClassModal()">
-                  <i class="bi bi-plus"></i> Add Class
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row mt-4">
-        <div class="col-md-12">
-          <div class="card">
-            <div class="card-header">
-              <h6 class="mb-0">Class History</h6>
-            </div>
-            <div class="card-body">
-              <div id="classHistoryTable">
-                <p class="text-muted">No class history available</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+   
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -1209,5 +1070,6 @@
     </script>
     
     <script src="/js/admin/teacher.js"></script>
+    <script src="/js/responsive.js"></script>
   </body>
 </html>

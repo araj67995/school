@@ -22,16 +22,15 @@ const {
 // Apply authentication middleware to all admin teacher routes
 router.use(requireAdmin);
 
-router.get("/", (req, res) => {
-  Teacher.find()
-    .then((found) => {
-      res.render("admin/teacher", {
-        teacher: found,
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+router.get('/', async (req, res) => {
+  try {
+    const teacher = await Teacher.find();
+    // Fetch all teacher leave applications
+    const teacherLeaves = await TeacherLeave.find().sort({ createdAt: -1 });
+    res.render('admin/teacher', { teacher, teacherLeaves });
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
 });
 
 // Add teacher
@@ -194,9 +193,11 @@ router.post("/teacher-leave/approve", async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Leave not found" });
+
     leave.status = status;
     leave.remark = remark;
     await leave.save();
+
     // If approved, mark attendance as Leave for all dates in range
     if (status === "Approved") {
       let current = new Date(leave.fromDate);
@@ -224,8 +225,13 @@ router.post("/teacher-leave/approve", async (req, res) => {
         current.setDate(current.getDate() + 1);
       }
     }
+
+    // ✅ Delete the leave record after processing
+    await TeacherLeave.findByIdAndDelete(leaveId);
+
     res.json({ success: true, message: `Leave ${status.toLowerCase()}` });
   } catch (err) {
+    console.error("Error approving/rejecting leave:", err);
     res
       .status(500)
       .json({ success: false, message: "Error updating leave status" });

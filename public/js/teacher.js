@@ -283,3 +283,13 @@ function openLeaveModal() {
   const modal = new bootstrap.Modal(document.getElementById("leaveModal"));
   modal.show();
 }
+
+  // Reset leave form after submit
+  const leaveForm = document.getElementById("leaveForm");
+  if (leaveForm) {
+    leaveForm.addEventListener("submit", function () {
+      setTimeout(() => leaveForm.reset(), 500);
+    });
+  };
+
+  

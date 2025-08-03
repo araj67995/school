@@ -157,7 +157,11 @@
 
                   <!-- DATA DISPLAYED FROM NEXT LINE -->
                   <div class="data-display">
-                    <div class="student-list" id="studentList">
+                    <div
+                      class="student-list"
+                      id="studentList"
+                      style="max-height: 250px; overflow-y: auto"
+                    >
                       <!-- Student data will be populated here -->
                       <div class="alert alert-info">
                         <i class="fas fa-info-circle"></i> Please select a class
@@ -210,25 +214,27 @@
                     >
                       <div class="d-flex gap-3 mb-3 align-items-center">
                         <div class="col-3">
-                          <select class="form-select" id="monthFilter">
-                            <option value="all">All Months</option>
-                            <option value="jan">January</option>
-                            <option value="feb">February</option>
-                            <option value="mar">March</option>
-                            <option value="apr">April</option>
-                            <option value="may">May</option>
-                            <option value="jun">June</option>
-                            <option value="jul">July</option>
-                            <option value="aug">August</option>
-                            <option value="sep">September</option>
-                            <option value="oct">October</option>
-                            <option value="nov">November</option>
-                            <option value="dec">December</option>
+                          <div class="row g-2 mb-3">
+                        <div class="col-auto">
+                          <select id="monthSelect" class="form-select">
+                            <% for (let m = 1; m <= 12; m++) { %>
+                              <option value="<%= m %>" <%= selectedMonth === m ? 'selected' : '' %>><%= m %></option>
+                            <% } %>
                           </select>
+                        </div>
+                        <div class="col-auto">
+                          <select id="yearSelect" class="form-select">
+                            <% for (let y = 2023; y <= new Date().getFullYear(); y++) { %>
+                              <option value="<%= y %>" <%= selectedYear === y ? 'selected' : '' %>><%= y %></option>
+                            <% } %>
+                          </select>
+                        </div>
+                      </div>
                         </div>
                         <button
                           class="btn btn-outline-primary rounded-pill shadow-sm"
-                          onclick="openLeaveModal()"
+                          data-bs-toggle="modal"
+                          data-bs-target="#leaveModal"
                         >
                           <i class="fas fa-calendar-plus"></i> Apply For Leave
                         </button>
@@ -239,7 +245,11 @@
                       <p class="text-muted">
                         View your attendance history and monthly reports.
                       </p>
-                      <!-- Attendance data table/list here -->
+                      <div style="max-height: 250px; overflow-y: auto">
+                      <div id="attendanceTableContainer">
+                        <!-- Table will load here -->
+                      </div>
+                      </div>
                     </div>
                     <!-- Salary Tab -->
                     <div class="tab-pane fade" id="salary-record">
@@ -250,7 +260,40 @@
                       <p class="text-muted">
                         View your salary slips and payment records.
                       </p>
-                      <!-- Salary details go here -->
+                      <div style="max-height: 250px; overflow-y: auto">
+                        <table
+                          class="table table-striped table-bordered align-middle"
+                        >
+                          <thead class="table-light">
+                            <tr>
+                              <th>Month</th>
+                              <th>Year</th>
+                              <th>Net Salary</th>
+                              <th>Status</th>
+                              <th>Payment Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <% if (teacherSalaries && teacherSalaries.length >
+                            0) { %> <% teacherSalaries.forEach(function(sal) {
+                            %>
+                            <tr>
+                              <td><%= sal.month %></td>
+                              <td><%= sal.year %></td>
+                              <td>₹<%= sal.netSalary %></td>
+                              <td><%= sal.paymentStatus %></td>
+                              <td><%= sal.paymentDate || '-' %></td>
+                            </tr>
+                            <% }); %> <% } else { %>
+                            <tr>
+                              <td colspan="5" class="text-center">
+                                No salary records found.
+                              </td>
+                            </tr>
+                            <% } %>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -662,7 +705,7 @@
     <!-- Leave Application Modal -->
     <div class="modal fade" id="leaveModal" tabindex="-1">
       <div class="modal-dialog">
-        <form id="leaveForm">
+        <form id="leaveForm" action="/teacher/applyLeave" method="post">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">Apply for Leave</h5>
@@ -723,5 +766,73 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/teacher.js"></script>
+
+    <script>
+  const teacherId = "<%= teacher.teacherId %>";
+
+  document.getElementById("monthSelect").addEventListener("change", fetchAttendance);
+  document.getElementById("yearSelect").addEventListener("change", fetchAttendance);
+
+  function fetchAttendance() {
+    const month = document.getElementById("monthSelect").value;
+    const year = document.getElementById("yearSelect").value;
+
+    fetch(`/teacher/api/${teacherId}/attendance?month=${month}&year=${year}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          renderAttendanceTable(data.daily, data.year, data.month);
+        } else {
+          alert("Failed to load attendance.");
+        }
+      });
+  }
+
+  function renderAttendanceTable(dailyData, year, month) {
+    const daysInMonth = new Date(year, month, 0).getDate();
+    let html = `
+      <table class="table table-bordered">
+        <thead><tr>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Remark</th>
+        </tr></thead>
+        <tbody>`;
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const d = String(day).padStart(2, '0');
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${d}`;
+      const entry = dailyData[dateStr];
+
+      html += `<tr>
+        <td>${dateStr}</td>
+        <td>${entry ? formatStatus(entry.status) : '<span class="badge bg-secondary">Not Marked</span>'}</td>
+        <td>${entry?.remark || '-'}</td>
+      </tr>`;
+    }
+
+    html += "</tbody></table>";
+    document.getElementById("attendanceTableContainer").innerHTML = html;
+  }
+
+  function formatStatus(status) {
+    switch (status) {
+      case "Present":
+        return '<span class="badge bg-success">Present</span>';
+      case "Absent":
+        return '<span class="badge bg-danger">Absent</span>';
+      case "Half Day":
+        return '<span class="badge bg-warning text-dark">Half Day</span>';
+      case "Leave":
+        return '<span class="badge bg-info">Leave</span>';
+      default:
+        return status;
+    }
+  }
+
+  // Initial load
+  fetchAttendance();
+</script>
+
   </body>
 </html>

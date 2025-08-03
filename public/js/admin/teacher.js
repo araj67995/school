@@ -267,7 +267,7 @@ async function approveLeave(leaveId) {
     console.error("Error approving leave:", error);
     alert("Error approving leave. Please try again.");
   }
-}
+}  
 
 // Leave form submit
 const leaveForm = document.getElementById("leaveForm");

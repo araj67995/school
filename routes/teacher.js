@@ -26,6 +26,31 @@ router.get("/:id", async (req, res) => {
       });
     }
 
+    // Fetch teacher's own attendance and salary records
+   const year = req.query.year || new Date().getFullYear();
+    const month = req.query.month || new Date().getMonth() + 1; // JS month: 0-indexed
+
+    const monthStr = String(month).padStart(2, '0'); // "07"
+    const startDate = `${year}-${monthStr}-01`;
+    const endDate = `${year}-${monthStr}-31`; // We'll handle exact days in rendering
+
+    const attendan = await TeacherAttendance.find({
+      teacherId: req.params.id,
+      date: { $gte: startDate, $lte: endDate }
+    });
+
+    // Create daily map
+    const dailyStatus = {};
+    attendan.forEach((record) => {
+      dailyStatus[record.date] = {
+        status: record.status,
+        approved: record.approved,
+        remark: record.remark || "",
+      };
+    });
+
+    const teacherSalaries = await TeacherSalary.find({ teacherId: req.params.id }).sort({ year: -1, month: -1 });
+
     const present = await TeacherAttendance.find({
       teacherId: req.params.id,
       status: "Present",
@@ -62,18 +87,54 @@ router.get("/:id", async (req, res) => {
       teacher: teacher,
       present: present,
       leave: leave,
+       selectedMonth: parseInt(month),
+      selectedYear: parseInt(year),
+      attendanceDays: dailyStatus,
       absent: absent,
       halfDay: halfDay,
       sections: sections,
       students: students,
       marks: marks,
       attendances: attendances,
+      teacherSalaries: teacherSalaries,
     });
   } catch (error) {
     console.error("Teacher page error:", error);
     res.status(500).render("error", { message: "Internal server error" });
   }
 });
+
+router.get("/api/:id/attendance", async (req, res) => {
+  try {
+    const teacherId = req.params.id;
+    const year = parseInt(req.query.year);
+    const month = parseInt(req.query.month);
+
+    const monthStr = String(month).padStart(2, '0');
+    const startDate = `${year}-${monthStr}-01`;
+    const endDate = `${year}-${monthStr}-31`;
+
+    const records = await TeacherAttendance.find({
+      teacherId,
+      date: { $gte: startDate, $lte: endDate },
+    });
+
+    const daily = {};
+    records.forEach((rec) => {
+      daily[rec.date] = {
+        status: rec.status,
+        remark: rec.remark || '',
+        approved: rec.approved,
+      };
+    });
+
+    res.json({ success: true, daily, year, month });
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false, message: "Error loading attendance" });
+  }
+});
+
 
 // add attendence
 
@@ -232,6 +293,29 @@ router.post("/deleteMarks", (req, res) => {
       console.error(err);
       res.status(500).send("Error deleting subjects.");
     });
+});
+
+// Add POST route for leave application
+router.post("/applyLeave", async (req, res) => {
+  try {
+    const { fromDate, toDate, reason } = req.body;
+    const teacherId = req.user.id;
+    if (!fromDate || !toDate || !reason) {
+      return res.status(400).send("All fields are required");
+    }
+    const leave = new TeacherLeave({
+      teacherId,
+      fromDate,
+      toDate,
+      reason,
+      status: "Pending",
+    });
+    await leave.save();
+    res.redirect("back");
+  } catch (err) {
+    console.error("Error applying for leave:", err);
+    res.status(500).send("Server error while applying for leave");
+  }
 });
 
 module.exports = router;
