@@ -169,6 +169,8 @@ function viewStudentDetails(studentId) {
     document.getElementById("rollno").textContent = student.rollno;
     document.getElementById("section").textContent = student.section;
     document.getElementById("rollNo-marksheet").value = student.rollno;
+    document.getElementById("changeSectionEnrollmentNo").value = student.id;
+    document.getElementById("changeSectionClass").value = student.grade;
 
     const studentFees = fees.filter((f) => f.id === studentId);
     const tbody = document.getElementById("feeTableBody");
@@ -424,3 +426,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector("form"); // Change if you have a specific form ID/class
   form.addEventListener("submit", validateFeeType);
 });
+
+function openChangeSection() {
+  // Bootstrap 5 way of showing modal
+  let modal = new bootstrap.Modal(document.getElementById('sectionModal'));
+  modal.show();
+}
+
+

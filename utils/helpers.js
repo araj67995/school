@@ -43,8 +43,6 @@ async function generateStudentId() {
 async function rollnoGenerater(grade) {
   const year = new Date().getFullYear();
 
-  console.log(year);
-
   // Find all sections for this grade and year, sorted by section
   const records = await RollNo.find({ year, grade }).sort({ section: 1 });
 

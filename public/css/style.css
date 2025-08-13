@@ -2745,8 +2745,13 @@ body {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  border-radius: 10px;
+  border-radius: 10px; 
   overflow: hidden;
+}
+.marks-header{
+  background: #000;
+  color: #fff;
+  font-weight: 800;
 }
 
 .marks-table th,
@@ -2759,7 +2764,7 @@ body {
 .marks-table th {
   background: var(--light-bg);
   font-weight: 600;
-  color: var(--dark-text);
+  color: #000;
 }
 
 .marks-table tr:hover {

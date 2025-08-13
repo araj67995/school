@@ -1,10 +1,16 @@
 const mongoose = require('mongoose');
-const { formatDateToDDMMYYYY } = require('../utils/date');
+const { formatDateToDDMMYYYY, capitalizeWords} = require('../utils/date');
 
 const admissionSchema = new mongoose.Schema(
   {
-    name: String,
-    lastname: String,
+    name: {
+      type: String,
+      set: capitalizeWords
+    },
+    lastname: {
+      type: String,
+      set: capitalizeWords
+    },
     dob: Date,
     gender: String,
     email: String,
@@ -12,8 +18,14 @@ const admissionSchema = new mongoose.Schema(
     address: String,
     grade: String,
     previousSchool: String,
-    parent: String,
-    mother: String,
+    parent: {
+      type: String,
+      set: capitalizeWords
+    },
+    mother: {
+      type: String,
+      set: capitalizeWords
+    },
     parentNo: String,
     parentEmail: String,
     document: [String],

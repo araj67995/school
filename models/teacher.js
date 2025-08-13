@@ -1,11 +1,14 @@
 const mongoose = require('mongoose');
-const { formatDateToDDMMYYYY } = require('../utils/date'); // from model or route
+const { formatDateToDDMMYYYY, capitalizeWords } = require('../utils/date'); // from model or route
 
 // Teacher Schema
 const teacherSchema = new mongoose.Schema(
   {
     teacherId: String,
-    name: String,
+    name: {
+      type: String,
+      set: capitalizeWords
+    },
     dob: String,
     gender: String,
     email: String,
@@ -14,8 +17,14 @@ const teacherSchema = new mongoose.Schema(
     grade: String,
     section: String,
     previousWorking: String,
-    father: String,
-    mother: String,
+    father: {
+      type: String,
+      set: capitalizeWords
+    },
+    mother: {
+      type: String,
+      set: capitalizeWords
+    },
     experience: Number,
     salary: Number,
     subject: String,

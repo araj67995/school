@@ -300,7 +300,7 @@ router.post("/addMarksheet", async (req, res) => {
     practical,
     total,
     grade,
-    rollno
+    rollno,
   } = req.body;
 
   try {
@@ -425,5 +425,58 @@ router.post("/credential", async (req, res) => {
     res.status(500).send("Internal server error");
   }
 });
+
+router.post("/publish-marks", async (req, res) => {
+  try {
+    // Update all marksheets with "Unpublish" status to "Publish"
+    const result = await Marksheet.updateMany(
+      { status: "Unpublish" },
+      { $set: { status: "Publish" } }
+    ); // Respond with info about the operation
+
+    res.status(200).json({
+      message: "Marksheets published successfully",
+      matchedCount: result.matchedCount,
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    console.error("Error publishing marks:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.post("/changeSection", async (req, res) => {
+  try {
+    const { id, grade, section } = req.body;
+
+    if (!id || !grade || !section) {
+      return res.status(400).send("Missing id, grade, or section");
+    }
+
+    // Count how many students are already in that grade + section
+    const students = await Student.find({ grade, section });
+    const rollno = students.length + 1;
+
+    // Update the student's section and roll number
+    const updated = await Student.findOneAndUpdate(
+      { enrollmentNo: id },
+      { section, rollno }, // also updating section here
+      { new: true } // return updated document
+    );
+
+    if (!updated) {
+      return res.status(404).send("Student not found");
+    }
+
+    console.log(`Updated ${updated.name}: ${updated.section} - Roll No ${updated.rollno}`);
+
+    // Send success JSON (or redirect if needed)
+    res.redirect("/admin/student");
+  } catch (error) {
+    console.error("Error changing section:", error);
+    res.status(500).send("Internal server error");
+  }
+});
+
 
 module.exports = router;

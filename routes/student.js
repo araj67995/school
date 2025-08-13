@@ -16,7 +16,7 @@ router.get("/:id", async (req, res) => {
     const student = await Student.findOne({ enrollmentNo: req.params.id });
     const fees = await Fee.find({ enrollmentNo: req.params.id });
     const attendances = await Attendance.find({ enrollmentNo: req.params.id });
-    const marks = await Marksheet.find({ enrollmentNo: req.params.id });
+    const marks = await Marksheet.find({ enrollmentNo: req.params.id, status: "Publish" });
 
     if (!student) {
       return res.status(404).render("error", { message: "Student not found" });

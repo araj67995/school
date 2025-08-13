@@ -1,11 +1,14 @@
-const mongoose = require('mongoose');
-const { formatDateToDDMMYYYY } = require('../utils/date');
+const mongoose = require("mongoose");
+const { formatDateToDDMMYYYY, capitalizeWords } = require("../utils/date");
 
 // Student Schema
 const studentSchema = new mongoose.Schema(
   {
     enrollmentNo: String,
-    name: String,
+    name: {
+      type: String,
+      set: capitalizeWords,
+    },
     dob: String,
     gender: String,
     email: String,
@@ -13,10 +16,17 @@ const studentSchema = new mongoose.Schema(
     address: String,
     grade: String,
     rollno: Number,
-    section: String,
+    section: { type: String, set: capitalizeWords, },
     previousSchool: String,
-    parentName: String,
-    mother: String,
+    session: { type: String, defult: "2025-2026" },
+    parentName: {
+      type: String,
+      set: capitalizeWords,
+    },
+    mother: {
+      type: String,
+      set: capitalizeWords,
+    },
     parentPhone: String,
     parentEmail: String,
     document: [String],
@@ -26,8 +36,8 @@ const studentSchema = new mongoose.Schema(
       default: "Active",
     },
     joiningDate: {
-     type: String,
-      default: () => formatDateToDDMMYYYY(new Date())
+      type: String,
+      default: () => formatDateToDDMMYYYY(new Date()),
     },
   },
   { timestamps: true }
@@ -54,7 +64,7 @@ const feeSchema = new mongoose.Schema(
     status: String,
     createdAt: {
       type: String,
-      default: () => formatDateToDDMMYYYY(new Date())
+      default: () => formatDateToDDMMYYYY(new Date()),
     },
   },
   { timestamps: true }
@@ -92,10 +102,11 @@ const marksSchema = new mongoose.Schema({
   name: { type: String, required: true },
   fathersName: { type: String },
   grade: { type: String, required: true },
-  section: {type: String},
+  section: { type: String },
   rollno: { type: String },
   term: { type: String, required: true }, // "term1", "term2", etc.
   subjects: [subjectSchema],
+  status: { type: String, default: "Unpublish" },
   createdAt: { type: Date, default: Date.now },
 });
 

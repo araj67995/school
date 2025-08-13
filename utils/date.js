@@ -5,4 +5,12 @@ function formatDateToDDMMYYYY(date) {
   return `${d}-${m}-${y}`;
 }
 
-module.exports = { formatDateToDDMMYYYY };
+function capitalizeWords(val) {
+  if (typeof val !== 'string') return '';
+  return val
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+module.exports = { formatDateToDDMMYYYY, capitalizeWords };

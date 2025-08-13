@@ -60,9 +60,17 @@
     </div>
 
     <div class="main-content">
+     
       <!-- Students Section -->
       <div id="students" class="section">
+       <div class="container d-flex justify-content-between align-items-center">
         <h2 class="mb-4">Students</h2>
+        <div id="marksheet-publish" class="section">
+          <form method="post" action="/admin/student/publish-marks">
+            <button type="submit" class="btn btn-primary"> <i class="bi bi-file-earmark-spreadsheet"></i> Publish Marksheet</button>
+          </form>
+        </div>
+       </div>
         <div class="row mb-3">
           <div class="col-md-3">
             <select
@@ -228,8 +236,10 @@
                 <div class="col-2">
                   <div class="info-item">
                     <label class="text-muted">Section</label>
-                    <p class="mb-3" id="section"></p>
-                  </div>
+                    <button onclick="openChangeSection()" class="btn p-0 border-0">
+                    <span class="mb-3" id="section"></span>
+                  </button>
+                </div>
                 </div>
                 <div class="col-2">
                    <div class="info-item">
@@ -603,6 +613,30 @@
           <button type="submit" class="btn btn-primary">Save</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Change Section -->
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="sectionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/admin/student/changeSection" method="post">
+      <div class="modal-header">
+        <h5 class="modal-title">Change Section</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="sectionInput" class="form-control" name="section" placeholder="Enter section">
+      </div>
+      <input type="hidden" id="changeSectionEnrollmentNo" name="id">
+      <input type="hidden" id="changeSectionClass" name="grade">
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
       </form>
     </div>
   </div>

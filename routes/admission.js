@@ -1,7 +1,8 @@
 const express = require("express");
-const router = express.Router();  // ← invoke the Router function
+const router = express.Router(); // ← invoke the Router function
 
 const Admission = require("../models/admission");
+const { sendAdmissionDetails } = require("../utils/mail.js");
 
 // ADMISSION ROUTE
 router.get("/", (req, res) => {
@@ -48,12 +49,19 @@ router.post("/", async (req, res) => {
     status: "Pending",
   });
 
-  AdmissionForm.save()
-    .then(() => res.render("success"))
-    .catch((err) => {
-      console.error("Error saving data:", err);
-      res.render("failure");
-    });
+  try {
+    // Save form to DB first
+    await AdmissionForm.save();
+
+    // Send confirmation email (combine first & last name)
+    const fullName = `${firstName} ${lastName || ""}`.trim();
+    await sendAdmissionDetails(fullName, email);
+
+    res.render("success");
+  } catch (err) {
+    console.error("Error saving data or sending email:", err);
+    res.render("failure");
+  }
 });
 
 module.exports = router;
